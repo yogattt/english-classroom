@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "papers": [
+    {
+      "id": "grade9-english-2026-autumn-01",
+      "title": "2026年秋季九年级英语练习（一）",
+      "subject": "英语",
+      "grade": "九年级",
+      "term": "2026年秋季",
+      "addedOn": "2026-10-15",
+      "description": "人物故事、学习方法与今昔变化。含华罗庚、南丁格尔、塞罕坝、青藏铁路和孔子等语篇。",
+      "scope": "原卷第3—8页 · 第28—77题与书面表达",
+      "unitCount": 8,
+      "exerciseCount": 50,
+      "hasWriting": true,
+      "tags": ["完形填空", "阅读理解", "六选五", "选词填空", "任务型阅读", "作文"],
+      "href": "papers/grade9-english-2026-autumn-01/index.html"
+    }
+  ]
+}
