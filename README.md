@@ -2,7 +2,10 @@
 
 目录首页：https://yogattt.github.io/english-classroom/
 
-当前课件：https://yogattt.github.io/english-classroom/papers/grade9-english-2026-autumn-01/
+当前课件：
+
+- [2026年秋季九年级英语练习（一）](https://yogattt.github.io/english-classroom/papers/grade9-english-2026-autumn-01/)
+- [2027届高考英语 建议信写作](https://yogattt.github.io/english-classroom/papers/gaokao-2027-advice-letter/)
 
 ## 仓库结构
 

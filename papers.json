@@ -13,8 +13,36 @@
       "unitCount": 8,
       "exerciseCount": 50,
       "hasWriting": true,
-      "tags": ["完形填空", "阅读理解", "六选五", "选词填空", "任务型阅读", "作文"],
+      "tags": [
+        "完形填空",
+        "阅读理解",
+        "六选五",
+        "选词填空",
+        "任务型阅读",
+        "作文"
+      ],
       "href": "papers/grade9-english-2026-autumn-01/index.html"
+    },
+    {
+      "id": "gaokao-2027-advice-letter",
+      "title": "2027届高考英语 · 建议信写作",
+      "subject": "英语",
+      "grade": "高三",
+      "term": "2027届一轮复习",
+      "addedOn": "2026-10-21",
+      "description": "从审题到成文：具体建议与理由、礼貌语气、语法辨析、三篇范文逐段精讲及分层写作训练。",
+      "scope": "12个授课单元 · 3篇范文 · 12道练习与3个写作任务",
+      "unitCount": 12,
+      "exerciseCount": 12,
+      "hasWriting": true,
+      "tags": [
+        "建议信",
+        "应用文写作",
+        "高考复习",
+        "语法辨析",
+        "范文精讲"
+      ],
+      "href": "papers/gaokao-2027-advice-letter/index.html"
     }
   ]
 }
