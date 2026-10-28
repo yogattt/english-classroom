@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>美，是一种抵抗 ——《短文两篇》联读</title>
+<style>
+:root{
+  --paper:#f5efe2; --paper2:#ece3cf; --ink:#2b2622; --ink2:#5a5148; --mute:#8a7f72;
+  --red:#a8352a; --blue:#2f5d73; --green:#4f6b4a; --gold:#b08a3e; --line:#d6c9ae;
+  --serif:"Songti SC","STSong","Noto Serif SC","Source Han Serif SC","SimSun",serif;
+  --kai:"Kaiti SC","STKaiti","KaiTi","BiauKai",var(--serif);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#1d1a17;overflow:hidden;font-family:var(--serif);color:var(--ink)}
+button{font-family:inherit;cursor:pointer}
+
+/* ---------- 舞台：固定 1600×900，按窗口等比缩放 ---------- */
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{width:1600px;height:900px;position:relative;flex:none;transform-origin:center center;
+  background:radial-gradient(ellipse at 30% 20%,#faf6ec 0%,var(--paper) 55%,var(--paper2) 100%);
+  box-shadow:0 20px 80px rgba(0,0,0,.5);overflow:hidden}
+#stage::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .33 0 0 0 0 .25 0 0 0 .18 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+.slide{position:absolute;inset:0;padding:90px 120px 110px;display:flex;flex-direction:column;
+  opacity:0;visibility:hidden;transition:opacity .5s ease, transform .5s ease;transform:translateX(30px)}
+.slide{overflow-y:auto;overscroll-behavior:contain}
+.slide.active{opacity:1;visibility:visible;transform:none}
+.slide.past{transform:translateX(-30px)}
+.slide .notes{display:none}
+
+/* 角标 */
+.tag{position:absolute;top:44px;left:120px;font-size:20px;letter-spacing:.3em;color:var(--mute)}
+.tag b{color:var(--red);font-weight:normal;margin-right:.6em}
+.seal{display:inline-block;border:2px solid var(--red);color:var(--red);padding:4px 10px;font-size:20px;letter-spacing:.2em;border-radius:4px}
+
+h1{font-size:96px;letter-spacing:.12em;font-weight:900;line-height:1.2}
+h2{font-size:56px;letter-spacing:.08em;margin-bottom:36px;font-weight:700}
+h2 small{font-size:26px;color:var(--mute);font-weight:normal;margin-left:20px;letter-spacing:.1em}
+h3{font-size:34px;margin-bottom:16px;letter-spacing:.06em}
+p,li{font-size:30px;line-height:1.75}
+.kai{font-family:var(--kai)}
+.red{color:var(--red)} .blue{color:var(--blue)} .green{color:var(--green)} .mute{color:var(--mute)}
+.center{text-align:center;align-items:center;justify-content:center}
+.grow{flex:1}
+.row{display:flex;gap:48px}
+.col{flex:1;display:flex;flex-direction:column}
+
+/* 渐进显示片段 */
+.frag{opacity:0;transform:translateY(14px);transition:all .45s ease}
+.frag.on{opacity:1;transform:none}
+
+/* 卡片 */
+.card{background:rgba(255,253,247,.75);border:1px solid var(--line);border-radius:10px;padding:30px 36px;
+  box-shadow:0 2px 0 rgba(0,0,0,.03)}
+.card.out{border-top:6px solid var(--green)}
+.card.in{border-top:6px solid var(--blue)}
+.card h3 .who{font-size:22px;color:var(--mute);margin-left:12px;font-weight:normal}
+
+/* 原文 */
+.text{font-family:var(--kai);font-size:44px;line-height:2.15;letter-spacing:.08em;text-align:justify}
+.text .g{border-bottom:3px dotted var(--gold);cursor:pointer;transition:background .2s;border-radius:3px}
+.text .g:hover,.text .g.sel{background:rgba(176,138,62,.22)}
+body.hide-g .text .g{border-bottom-color:transparent}
+.text .hl{color:var(--red)}
+.trans{font-size:26px;line-height:1.85;color:var(--ink2);margin-top:20px;padding:20px 28px;border-left:4px solid var(--gold);background:rgba(255,253,247,.6);display:none}
+.trans.show{display:block}
+.mini-btn{border:1px solid var(--line);background:#fffaf0;color:var(--ink2);font-size:20px;padding:6px 16px;border-radius:20px;margin-right:10px}
+.mini-btn:hover{border-color:var(--gold);color:var(--ink)}
+#pop{position:fixed;z-index:50;max-width:420px;background:#2b2622;color:#f5efe2;padding:14px 18px;border-radius:8px;font-size:20px;line-height:1.6;pointer-events:none;opacity:0;transition:opacity .15s;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+#pop.on{opacity:1}
+#pop .py{color:#e7c27a;font-family:Georgia,serif;margin-left:8px}
+#pop .w{font-size:24px;font-family:var(--kai)}
+
+/* 正音卡 */
+.flip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:30px;margin-top:20px}
+.flip{height:250px;perspective:900px;cursor:pointer}
+.flip .in{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+.flip.turned .in{transform:rotateY(180deg)}
+.flip .f,.flip .b{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid var(--line)}
+.flip .f{background:#fffaf0}
+.flip .f .ch{font-family:var(--kai);font-size:110px;line-height:1}
+.flip .f .ctx{font-size:22px;color:var(--mute);margin-top:12px}
+.flip .b{background:var(--ink);color:var(--paper);transform:rotateY(180deg);padding:20px}
+.flip .b .py{font-family:Georgia,serif;font-size:56px;color:#e7c27a}
+.flip .b .m{font-size:22px;margin-top:10px;text-align:center;line-height:1.5}
+
+/* 填空 */
+.blank{display:inline-block;min-width:260px;border-bottom:3px solid var(--ink);text-align:center;cursor:pointer;color:transparent;transition:color .4s}
+.blank.on{color:var(--red)}
+
+/* 对比表 */
+table.cmp{width:100%;border-collapse:collapse;font-size:25px;line-height:1.5}
+table.cmp th,table.cmp td{border-bottom:1px solid var(--line);padding:14px 18px;text-align:left;vertical-align:middle}
+table.cmp thead th{font-size:28px;border-bottom:3px solid var(--ink)}
+table.cmp thead th:nth-child(2){color:var(--green)} table.cmp thead th:nth-child(3){color:var(--blue)}
+table.cmp tbody th{width:180px;color:var(--ink2);font-weight:normal;letter-spacing:.1em}
+table.cmp td{font-family:var(--kai);font-size:28px;cursor:pointer;position:relative}
+table.cmp td span{transition:opacity .4s}
+table.cmp td:not(.on) span{opacity:0}
+table.cmp td:not(.on)::after{content:"点击揭示";position:absolute;left:18px;top:50%;transform:translateY(-50%);font-family:var(--serif);font-size:18px;color:#c4b79c;letter-spacing:.2em}
+
+/* 投票 */
+.vote{display:flex;gap:40px;margin-top:10px}
+.vote button{flex:1;border:2px solid var(--line);background:#fffaf0;border-radius:14px;padding:22px;font-size:36px;letter-spacing:.2em;display:flex;justify-content:space-between;align-items:center}
+.vote button .n{font-family:Georgia,serif;font-size:44px;color:var(--red)}
+.vote button:active{transform:scale(.98)}
+.bar{height:16px;border-radius:8px;background:var(--line);overflow:hidden;display:flex;margin-top:16px}
+.bar i{display:block;height:100%;transition:width .4s}
+
+/* 大字 */
+.big{font-family:var(--kai);font-size:76px;line-height:1.6;letter-spacing:.1em}
+.quote{font-family:var(--kai);font-size:48px;line-height:1.8;letter-spacing:.06em}
+.divider{width:120px;height:3px;background:var(--red);margin:30px auto}
+
+/* 板书 */
+.board{background:#2f3b32;color:#eef0e6;border:14px solid #6d5236;border-radius:8px;padding:50px 70px;font-family:var(--kai);box-shadow:inset 0 0 60px rgba(0,0,0,.35)}
+.board .t{font-size:58px;text-align:center;letter-spacing:.2em;margin-bottom:36px}
+.board .r{display:grid;grid-template-columns:300px 140px 1fr 1fr;gap:20px;font-size:38px;line-height:2;align-items:center}
+.board .r .a{color:#f3d68a}
+.board .b{font-size:38px;text-align:center;margin-top:36px;color:#f2b5a8}
+
+/* 时间轴 */
+.timeline{display:flex;align-items:center;gap:0;margin:20px 0 40px}
+.timeline .pt{flex:1;text-align:center;position:relative}
+.timeline .pt .d{width:22px;height:22px;border-radius:50%;background:var(--ink);margin:0 auto 14px}
+.timeline .pt:not(:last-child)::after{content:"";position:absolute;top:10px;left:calc(50% + 14px);right:calc(-50% + 14px);height:2px;background:var(--ink2)}
+
+/* 小测 */
+.quiz{display:flex;flex-direction:column;gap:22px}
+.q{background:rgba(255,253,247,.75);border:1px solid var(--line);border-radius:10px;padding:20px 28px}
+.q .stem{font-size:28px;margin-bottom:12px}
+.q .opts{display:flex;gap:16px;flex-wrap:wrap}
+.q .opts button{border:1px solid var(--line);background:#fffaf0;font-size:24px;padding:8px 22px;border-radius:8px}
+.q .opts button.right{background:var(--green);color:#fff;border-color:var(--green)}
+.q .opts button.wrong{background:var(--red);color:#fff;border-color:var(--red);animation:shake .3s}
+.q .why{font-size:22px;color:var(--ink2);margin-top:10px;display:none}
+.q.done .why{display:block}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* 装饰：远山 */
+.mountains{position:absolute;left:0;right:0;bottom:0;height:300px;pointer-events:none;opacity:.5}
+.moon{position:absolute;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#fffdf5,#efe4c4);box-shadow:0 0 80px 30px rgba(255,245,215,.6)}
+
+/* ---------- 底部工具条 ---------- */
+#hud{position:fixed;left:0;right:0;bottom:0;height:52px;display:flex;align-items:center;gap:14px;padding:0 18px;
+  background:rgba(29,26,23,.88);color:#d9cfbe;font-size:15px;z-index:20;transition:transform .3s;font-family:var(--serif)}
+body.hud-hide #hud{transform:translateY(100%)}
+#hud a{color:#d9cfbe;text-decoration:none;border:1px solid #4a433b;border-radius:6px;padding:5px 12px;font-size:14px;white-space:nowrap}
+#hud button{background:transparent;border:1px solid #4a433b;color:#d9cfbe;border-radius:6px;padding:5px 12px;font-size:14px}
+#hud button:hover{border-color:#b08a3e;color:#fff}
+#hud .sp{flex:1}
+#progress{position:fixed;left:0;top:0;height:4px;background:var(--red);z-index:21;transition:width .4s}
+#timer{font-family:Menlo,Consolas,monospace;font-size:18px;padding:3px 10px;border-radius:6px;background:#2f2a25;min-width:84px;text-align:center}
+#timer.warn{background:#7a5a1e} #timer.over{background:#7d2a22;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.55}}
+#secname{color:#e7c27a}
+
+/* ---------- 教师备注抽屉 ---------- */
+#notes{position:fixed;top:0;right:0;bottom:52px;width:min(520px,92vw);background:#fbf7ee;color:var(--ink);z-index:30;
+  transform:translateX(100%);transition:transform .3s;overflow-y:auto;padding:28px 30px;font-size:17px;line-height:1.8}
+body.notes-on #notes{transform:none;box-shadow:-10px 0 40px rgba(0,0,0,.4)}
+#notes h4{font-size:18px;color:var(--red);margin:16px 0 6px;letter-spacing:.1em}
+#notes h4:first-child{margin-top:0}
+#notes p,#notes li{font-size:17px;line-height:1.8}
+#notes ul{padding-left:1.2em}
+#notes .sv{color:var(--blue)}
+
+/* 目录 */
+#toc{position:fixed;inset:0;background:rgba(29,26,23,.92);z-index:40;display:none;padding:50px 8vw;overflow:auto;color:#eee}
+body.toc-on #toc{display:block}
+#toc h4{font-size:22px;letter-spacing:.3em;color:#e7c27a;margin-bottom:24px}
+#toc .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+#toc button{background:#2f2a25;border:1px solid #4a433b;color:#eee;text-align:left;padding:14px 16px;border-radius:8px;font-size:16px;line-height:1.5}
+#toc button .s{display:block;color:#b8a98f;font-size:13px}
+#toc button.cur{border-color:#e7c27a}
+
+/* 随机点组 */
+#picker{position:fixed;inset:0;background:rgba(29,26,23,.85);z-index:45;display:none;align-items:center;justify-content:center;flex-direction:column;color:#fff}
+body.pick-on #picker{display:flex}
+#picker .num{font-size:200px;font-family:Georgia,serif;color:#e7c27a;line-height:1}
+#picker .lbl{font-size:30px;letter-spacing:.3em;margin-top:10px}
+#picker .ctl{margin-top:40px;font-size:18px;display:flex;gap:12px;align-items:center}
+#picker input{width:70px;font-size:18px;padding:4px 8px;border-radius:6px;border:none}
+#picker button{background:#b08a3e;border:none;color:#fff;font-size:18px;padding:8px 20px;border-radius:6px}
+
+/* 帮助 */
+#help{position:fixed;inset:0;background:rgba(29,26,23,.9);z-index:46;display:none;align-items:center;justify-content:center;color:#eee}
+body.help-on #help{display:flex}
+#help table{font-size:18px;border-collapse:collapse}
+#help td{padding:8px 22px;border-bottom:1px solid #3a342e}
+#help kbd{background:#3a342e;border-radius:4px;padding:2px 8px;font-family:Menlo,monospace;color:#e7c27a}
+@media(max-width:1100px){#hud{overflow-x:auto;gap:8px}#hud>*{flex-shrink:0}#secname{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="viewport"><div id="stage">
+
+<!-- ======================= 1 封面 ======================= -->
+<section class="slide center" data-sec="0" data-title="封面">
+  <div class="moon" style="right:180px;top:110px"></div>
+  <svg class="mountains" viewBox="0 0 1600 300" preserveAspectRatio="none"><path d="M0 300 L0 190 Q120 120 230 170 T470 140 Q560 70 680 150 T930 120 Q1060 50 1180 140 T1430 110 Q1520 90 1600 150 L1600 300Z" fill="#9aa596"/><path d="M0 300 L0 240 Q160 190 320 230 T640 210 Q800 170 960 225 T1280 205 Q1450 180 1600 230 L1600 300Z" fill="#6f7d6c"/></svg>
+  <div class="seal" style="margin-bottom:34px">统编版 · 八年级上册 · 第三单元</div>
+  <h1>美，是一种抵抗</h1>
+  <div class="divider"></div>
+  <p style="font-size:36px;letter-spacing:.15em">《短文两篇》联读</p>
+  <p class="kai mute" style="font-size:32px;margin-top:14px">《答谢中书书》陶弘景　·　《记承天寺夜游》苏轼</p>
+  <div class="notes">
+    <h4>课前</h4>
+    <p>本课件：→ / 空格 下一步（有动画片段时先逐条显示），← 上一步；<b>N</b> 打开/关闭本备注；<b>M</b> 目录；<b>T</b> 开始/暂停计时；<b>R</b> 随机抽小组；<b>F</b> 全屏；<b>?</b> 快捷键说明。</p>
+    <p>准备：四人小组对比任务卡（第 12 页可直接投屏完成）、板书。</p>
+    <h4>课时安排（45 分钟）</h4>
+    <ul><li>导入 5′</li><li>初读 8′</li><li>比读 15′（核心）</li><li>深读 10′</li><li>升华 5′</li><li>收束与作业 2′</li></ul>
+  </div>
+</section>
+
+<!-- ======================= 2 学习目标 ======================= -->
+<section class="slide" data-sec="0" data-title="学习目标">
+  <div class="tag"><b>课前</b>学习目标</div>
+  <h2>这节课，我们要走到哪里</h2>
+  <div class="row grow" style="align-items:stretch">
+    <div class="col card frag"><h3><span class="red">壹</span>　读</h3><p>正确朗读、背诵两文；掌握“入云、交辉、俱备、与、遂、相与、盖、闲人”等词句。</p></div>
+    <div class="col card frag"><h3><span class="red">贰</span>　比</h3><p>比较两文“所观之景—观景之人—观景之境—观景之情”，发现<span class="green">向外</span>与<span class="blue">向内</span>。</p></div>
+    <div class="col card frag"><h3><span class="red">叁</span>　品</h3><p>品味“高峰入云，清流见底”“庭下如积水空明”的写景之妙。</p></div>
+    <div class="col card frag"><h3><span class="red">肆</span>　悟</h3><p>体会中国文人以山水安顿生命的传统，理解“美是一种抵抗”。</p></div>
+  </div>
+  <div class="notes">
+    <h4>说明</h4><p>目标快速过一遍即可（约 30 秒），不展开，避免“道理先行”。“美是一种抵抗”是本课的探究视角，并非两文的唯一主旨或作者原话；先让学生带着好奇进入，再依据原文讨论。</p>
+  </div>
+</section>
+
+<!-- ======================= 3 导入：真问题 ======================= -->
+<section class="slide" data-sec="1" data-title="一个真问题">
+  <div class="tag"><b>环节一</b>导入 · 一个真问题</div>
+  <div class="row" style="margin-top:30px">
+    <div class="col card out">
+      <h3>《答谢中书书》<span class="who">南朝 · 陶弘景</span></h3>
+      <p class="kai" style="font-size:34px">高峰入云，清流见底……</p>
+      <p class="mute" style="font-size:24px;margin-top:8px">约公元 5—6 世纪 · 茅山</p>
+    </div>
+    <div class="col card in">
+      <h3>《记承天寺夜游》<span class="who">北宋 · 苏轼</span></h3>
+      <p class="kai" style="font-size:34px">庭下如积水空明……</p>
+      <p class="mute" style="font-size:24px;margin-top:8px">公元 1083 年 · 黄州</p>
+    </div>
+  </div>
+  <div class="timeline frag" style="margin-top:50px">
+    <div class="pt"><div class="d" style="background:var(--green)"></div><p style="font-size:24px">南朝 · 陶弘景</p></div>
+    <div class="pt"><div class="d" style="background:transparent;border:2px dashed var(--mute)"></div><p style="font-size:24px" class="mute">相隔五百余年</p></div>
+    <div class="pt"><div class="d" style="background:var(--blue)"></div><p style="font-size:24px">北宋 · 苏轼</p></div>
+  </div>
+  <p class="frag center" style="display:flex;font-size:46px;letter-spacing:.06em">教材为什么把它们编入<span class="red">同一课</span>？</p>
+  <div class="notes">
+    <h4>教师活动</h4>
+    <ul><li>出示课题，板书“短文两篇：《答谢中书书》陶弘景／《记承天寺夜游》苏轼”。</li>
+    <li>抛出真问题，请学生自由发言——<b>先听，不急着纠正</b>。</li></ul>
+    <h4>预设与点拨</h4>
+    <p>生：“都很短呗。”<br><span class="sv">师：“确实。可是短而美的文章，何止这两篇？”</span></p>
+    <p>生：“都写景，都在看风景。”<br><span class="sv">师：（顺势引出下一页）</span></p>
+    <h4>设计意图</h4><p>用真问题制造认知冲突，结论由学生自己生出。</p>
+  </div>
+</section>
+
+<!-- ======================= 4 导入：向外 / 向内 ======================= -->
+<section class="slide center" data-sec="1" data-title="向外走 / 向内走">
+  <div class="tag"><b>环节一</b>导入 · 一个真问题</div>
+  <p class="mute" style="font-size:30px;margin-bottom:40px">有个同学说得很准——</p>
+  <div class="row" style="width:100%;justify-content:center;gap:120px">
+    <div class="frag" style="text-align:center"><div class="big green">向外走</div><p class="mute">陶弘景 · 走进山川河流</p></div>
+    <div class="frag" style="text-align:center"><div class="big blue">向内走</div><p class="mute">苏轼 · 走进一个小院子</p></div>
+  </div>
+  <p class="frag" style="margin-top:60px;font-size:38px">但两个人<span class="red">都在看风景</span>。</p>
+  <p class="frag mute" style="margin-top:20px">向外走和向内走，差别到底有多大？他们究竟在看什么？</p>
+  <div class="notes">
+    <h4>点拨语</h4>
+    <p class="sv">“陶弘景向外走，走进山川河流；苏轼向内走，走进一个小院子。但两个人都在看风景。向外走和向内走，差别到底有多大？我们今天就走进这两篇，看看他们究竟在看什么。”</p>
+    <p>若学生已自发说出“向外/向内”，直接用学生原话，并点名肯定。</p>
+  </div>
+</section>
+
+<!-- ======================= 5 知人：作者 ======================= -->
+<section class="slide" data-sec="2" data-title="认识两位作者">
+  <div class="tag"><b>环节二</b>初读 · 知人</div>
+  <h2>先认识两位“看风景的人”</h2>
+  <div class="row grow">
+    <div class="col card out">
+      <h3>陶弘景 <span class="who">456—536 · 字通明 · 号华阳隐居</span></h3>
+      <ul style="padding-left:1.1em">
+        <li>南朝齐梁时期思想家、医药学家、文学家。</li>
+        <li>历经宋、齐、梁三朝，三十六岁辞官，<b>隐居句容茅山</b>。</li>
+        <li>梁武帝屡请不出，却常派人入山咨询国事，时人称“<span class="red">山中宰相</span>”。</li>
+      </ul>
+    </div>
+    <div class="col card in">
+      <h3>苏　轼 <span class="who">1037—1101 · 字子瞻 · 号东坡居士</span></h3>
+      <ul style="padding-left:1.1em">
+        <li>北宋文学家、书画家，“唐宋八大家”之一。</li>
+        <li>1079 年“<span class="red">乌台诗案</span>”下狱，九死一生。</li>
+        <li>次年贬为黄州团练副使，“本州安置，<b>不得签书公事</b>”。本文写于贬居第四年。</li>
+      </ul>
+    </div>
+  </div>
+  <div class="notes">
+    <h4>说明（教材补充）</h4>
+    <p>此处只做“知人”铺垫，1 分钟内带过；更深的背景放在环节四“深读”中，用来回答“他们为什么非要看风景不可”。</p>
+    <p>可提一句：陶弘景爱山爱到什么程度？可用他题为《诏问山中何所有赋诗以答》的诗补充理解：“山中何所有，岭上多白云。只可自怡悦，不堪持赠君”（拓展页有）。</p>
+  </div>
+</section>
+
+<!-- ======================= 6 文体与题目 ======================= -->
+<section class="slide" data-sec="2" data-title="解题">
+  <div class="tag"><b>环节二</b>初读 · 解题</div>
+  <h2>读题目，先读出“对话的对象”</h2>
+  <div class="row grow">
+    <div class="col card out">
+      <h3 class="kai" style="font-size:44px">答 · 谢中书 · 书</h3>
+      <p>“<b>答</b>”：回复。“<b>谢中书</b>”：谢微（一说谢徵），曾任中书鸿胪。“<b>书</b>”：书信。</p>
+      <p class="frag" style="margin-top:14px">→ 这是一封<span class="red">回信</span>。写给朋友，谈的却是“山川之美”。</p>
+    </div>
+    <div class="col card in">
+      <h3 class="kai" style="font-size:44px">记 · 承天寺 · 夜游</h3>
+      <p>“<b>记</b>”：古代一种文体，可叙事、写景、抒情。承天寺，在今湖北黄冈。</p>
+      <p class="frag" style="margin-top:14px">→ 这是一则<span class="red">随笔</span>。写给自己，记下一个因月色而起行的夜晚。</p>
+    </div>
+  </div>
+  <p class="frag" style="margin-top:20px;font-size:32px;text-align:center">一个<span class="green">说给知音听</span>，一个<span class="blue">说给自己听</span>——这已经是“向外/向内”的第一个线索。</p>
+  <div class="notes">
+    <h4>补充说明</h4>
+    <p>“书”与“记”的文体差异，是本课框架的一个小伏笔：书信有明确的读者（谢中书，乃至隐含的谢灵运），随笔则面向自我。</p>
+  </div>
+</section>
+
+<!-- ======================= 7 原文一 ======================= -->
+<section class="slide" data-sec="2" data-title="原文 · 答谢中书书">
+  <div class="tag"><b>环节二</b>初读 · 读通</div>
+  <h2>答谢中书书 <small>南朝 · 陶弘景</small></h2>
+  <div class="text">
+    山川之美，古来共谈。高峰<span class="g" data-w="入云" data-n="高耸入云。（仰视）">入云</span>，清流<span class="g" data-w="见底" data-n="清澈见底。（俯视）">见底</span>。两岸石壁，<span class="g" data-w="五色交辉" data-n="各种颜色交相辉映。">五色交辉</span>。青林翠竹，<span class="g" data-w="四时俱备" data-n="四季都有。俱，都。">四时俱备</span>。晓雾将<span class="g" data-w="歇" data-n="消散。">歇</span>，猿鸟<span class="g" data-w="乱鸣" data-n="此起彼伏地鸣叫。">乱鸣</span>；夕日欲<span class="g" data-w="颓" data-n="坠落。">颓</span>，<span class="g" data-w="沉鳞竞跃" data-n="潜游在水中的鱼争相跳出水面。沉鳞，指潜游在水中的鱼。">沉鳞竞跃</span>。<span class="hl">实是<span class="g" data-w="欲界之仙都" data-n="人间仙境。欲界，佛教把世界分为欲界、色界、无色界，欲界是有各种欲望的众生所居之处，即人间。仙都，神仙居住的美好地方。">欲界之仙都</span></span>。自<span class="g" data-w="康乐" data-n="指南朝宋山水诗人谢灵运，袭封康乐公。">康乐</span>以来，未复有能<span class="g" data-w="与" data-p="yù" data-n="参与，这里指欣赏。">与</span>其奇者。
+  </div>
+  <div style="margin-top:14px"><button class="mini-btn" data-trans="t1">参考译文</button><button class="mini-btn" data-allg>注释提示 开/关（G）</button></div>
+  <div class="trans" id="t1">山川景色的美丽，自古以来就是文人雅士共同谈赏的。巍峨的山峰高耸入云，明净的溪流清澈见底。两岸的石壁色彩斑斓，交相辉映。青葱的林木，翠绿的竹丛，四季常存。清晨的薄雾将要消散的时候，传来猿猴、鸟雀此起彼伏的鸣叫声；夕阳快要落山的时候，潜游在水中的鱼儿争相跃出水面。这里实在是人间仙境啊。自从南朝的谢灵运以来，就再也没有人能够欣赏这奇丽的景色了。</div>
+  <div class="notes">
+    <h4>朗读指导</h4>
+    <p>四字一顿，读出节奏：山川/之美，古来/共谈。高峰/入云，清流/见底……</p>
+    <p>“实是欲界之仙都”读出赞叹；末句“未复有能与其奇者”读出自得。</p>
+    <h4>点讲词</h4><p>入云、交辉、四时俱备、与（yù）其奇者、欲界之仙都。点击原文中带下划线的词可显示注释。</p>
+  </div>
+</section>
+
+<!-- ======================= 8 原文二 ======================= -->
+<section class="slide" data-sec="2" data-title="原文 · 记承天寺夜游">
+  <div class="tag"><b>环节二</b>初读 · 读通</div>
+  <h2>记承天寺夜游 <small>北宋 · 苏轼</small></h2>
+  <div class="text" style="font-size:42px">
+    <span class="g" data-w="元丰六年" data-n="公元 1083 年。元丰，宋神宗年号。">元丰六年</span>十月十二日夜，解衣欲睡，月色入<span class="g" data-w="户" data-n="门。一说指窗户。">户</span>，<span class="g" data-w="欣然" data-n="高兴的样子。">欣然</span>起行。<span class="g" data-w="念" data-n="考虑，想到。">念</span>无与为乐者，<span class="g" data-w="遂" data-p="suì" data-n="于是，就。">遂</span>至承天寺寻<span class="g" data-w="张怀民" data-n="名梦得，字怀民，苏轼的朋友。元丰六年也被贬到黄州，初到时寓居承天寺。">张怀民</span>。怀民亦未<span class="g" data-w="寝" data-n="睡，卧。">寝</span>，<span class="g" data-w="相与" data-n="共同，一起。">相与</span>步于<span class="g" data-w="中庭" data-n="庭院里。">中庭</span>。<span class="hl">庭下如积水<span class="g" data-w="空明" data-n="形容水的澄澈。">空明</span></span>，水中<span class="g" data-w="藻、荇" data-p="zǎo、xìng" data-n="均为水生植物。">藻、荇</span><span class="g" data-w="交横" data-n="交错纵横。">交横</span>，<span class="g" data-w="盖" data-p="gài" data-n="大概是，表推测语气。">盖</span>竹<span class="g" data-w="柏" data-p="bǎi" data-n="柏树。">柏</span>影也。何夜无月？何处无竹柏？<span class="g" data-w="但" data-n="只是。">但</span>少<span class="g hl" data-w="闲人" data-n="清闲的人。这里指不汲汲于名利而能从容流连光景的人。苏轼当时被贬，有职无权，所以自称“闲人”。">闲人</span>如吾两人者<span class="g" data-w="耳" data-n="罢了。">耳</span>。
+  </div>
+  <div style="margin-top:14px"><button class="mini-btn" data-trans="t2">参考译文</button><button class="mini-btn" data-allg>注释提示 开/关（G）</button></div>
+  <div class="trans" id="t2">元丰六年十月十二日夜晚，（我）脱下衣服准备睡觉，恰好看见月光照进门里，（于是）高兴地起身出门散步。想到没有可以与我同乐的人，就到承天寺寻找张怀民。怀民也还没有睡，我们便一起在庭院中散步。庭院中的月光宛如一泓积水那样清澈透明，水中的水藻、荇菜交错纵横，大概是竹子和柏树的影子吧。哪一个夜晚没有月光？哪个地方没有竹子和柏树呢？只是缺少像我们两个这样的清闲之人罢了。</div>
+  <div class="notes">
+    <h4>朗读指导</h4>
+    <p>“欣然起行”读出轻快；“念无与为乐者”稍顿，有一丝落寞；“怀民亦未寝”读出惊喜；末三句放慢，“但少闲人如吾两人者耳”意味深长。</p>
+    <h4>点讲词</h4><p>遂至、相与、盖（竹柏影也）、闲人。</p>
+  </div>
+</section>
+
+<!-- ======================= 9 正音 ======================= -->
+<section class="slide" data-sec="2" data-title="正音 · 翻卡">
+  <div class="tag"><b>环节二</b>初读 · 正音</div>
+  <h2>这几个字，你读对了吗？<small>点击卡片翻面</small></h2>
+  <div class="flip-grid">
+    <div class="flip"><div class="in"><div class="f"><div class="ch">与</div><div class="ctx">未复有能与其奇者</div></div><div class="b"><div class="py">yù</div><div class="m">参与，这里指欣赏</div></div></div></div>
+    <div class="flip"><div class="in"><div class="f"><div class="ch">遂</div><div class="ctx">遂至承天寺</div></div><div class="b"><div class="py">suì</div><div class="m">于是，就</div></div></div></div>
+    <div class="flip"><div class="in"><div class="f"><div class="ch">盖</div><div class="ctx">盖竹柏影也</div></div><div class="b"><div class="py">gài</div><div class="m">大概是（推测）</div></div></div></div>
+    <div class="flip"><div class="in"><div class="f"><div class="ch">柏</div><div class="ctx">何处无竹柏</div></div><div class="b"><div class="py">bǎi</div><div class="m">柏树</div></div></div></div>
+    <div class="flip"><div class="in"><div class="f"><div class="ch">颓</div><div class="ctx">夕日欲颓</div></div><div class="b"><div class="py">tuí</div><div class="m">坠落</div></div></div></div>
+    <div class="flip"><div class="in"><div class="f"><div class="ch">荇</div><div class="ctx">水中藻、荇交横</div></div><div class="b"><div class="py">xìng</div><div class="m">一种水生植物</div></div></div></div>
+    <div class="flip"><div class="in"><div class="f"><div class="ch">寝</div><div class="ctx">怀民亦未寝</div></div><div class="b"><div class="py">qǐn</div><div class="m">睡，卧</div></div></div></div>
+    <div class="flip"><div class="in"><div class="f"><div class="ch">鳞</div><div class="ctx">沉鳞竞跃</div></div><div class="b"><div class="py">lín</div><div class="m">代指鱼</div></div></div></div>
+  </div>
+  <div class="notes">
+    <h4>操作</h4><p>请学生先读，再翻卡核对。重点四字：与 yù、遂 suì、盖 gài、柏 bǎi。</p>
+    <p>之后齐读两文一遍，读出节奏。</p>
+  </div>
+</section>
+
+<!-- ======================= 10 一句话概括 ======================= -->
+<section class="slide center" data-sec="2" data-title="一句话概括">
+  <div class="tag"><b>环节二</b>初读 · 概括</div>
+  <h2>用一句话说</h2>
+  <p style="font-size:44px;margin:30px 0">陶弘景看的是 <span class="blank kai">一座大山 · 山川四时</span></p>
+  <p style="font-size:44px">苏　轼看的是 <span class="blank kai">一个小院 · 月下中庭</span></p>
+  <p class="frag" style="margin-top:70px;font-size:34px">看的东西差这么大——他们看风景时的<span class="red">心境</span>，一样吗？</p>
+  <div class="notes">
+    <h4>操作</h4><p>点击横线揭示答案。学生说法接近即可（“大山／山川四时”“小院／月光下的院子”）。</p>
+    <p class="sv">师（板书两栏）：“一座大山——一个小院。看的东西差这么大，他们看见的心境一样吗？我们细读。”</p>
+  </div>
+</section>
+
+<!-- ======================= 11 写法赏析 ======================= -->
+<section class="slide" data-sec="2" data-title="写景之妙">
+  <div class="tag"><b>环节二</b>初读 · 品景（补充）</div>
+  <h2>他们是怎样“看”的？</h2>
+  <div class="row grow">
+    <div class="col card out">
+      <h3 class="green">陶弘景：一幅山水长卷</h3>
+      <ul style="padding-left:1.1em;font-size:27px">
+        <li class="frag"><b>仰俯结合</b>：高峰入云（仰）／清流见底（俯）</li>
+        <li class="frag"><b>色彩点染</b>：五色交辉、青林翠竹</li>
+        <li class="frag"><b>动静相衬</b>：石壁、林竹为静；猿鸟乱鸣、沉鳞竞跃为动</li>
+        <li class="frag"><b>晨昏交替</b>：晓雾将歇／夕日欲颓——一日之内，四时之景</li>
+      </ul>
+    </div>
+    <div class="col card in">
+      <h3 class="blue">苏轼：一幅月夜小品</h3>
+      <ul style="padding-left:1.1em;font-size:27px">
+        <li class="frag"><b>以水喻月</b>：庭下如积水空明——不写“月”，月光已满</li>
+        <li class="frag"><b>以藻荇喻影</b>：水中藻、荇交横——竹柏之影，摇曳生姿</li>
+        <li class="frag"><b>先错觉，后点破</b>：“盖竹柏影也”——写出恍然一惊</li>
+        <li class="frag"><b>十八字写尽月色</b>：以虚写实，空灵澄澈</li>
+      </ul>
+    </div>
+  </div>
+  <div class="notes">
+    <h4>补充说明</h4><p>此页为写景手法的梳理，可根据课堂时间选用：时间紧则只点“仰俯”“以水喻月”两处，其余作为课后笔记。</p>
+    <p>追问示例：“庭下如积水空明”一句里，有没有一个‘月’字？为什么我们却觉得满纸都是月光？</p>
+  </div>
+</section>
+
+<!-- ======================= 12 对比任务卡 ======================= -->
+<section class="slide" data-sec="3" data-title="对比任务卡">
+  <div class="tag"><b>环节三</b>比读 · 看见“向外”与“向内”</div>
+  <h2 style="margin-bottom:20px">对比任务卡 <small>四人小组 · 5 分钟</small></h2>
+  <table class="cmp">
+    <thead><tr><th>对比项</th><th>陶弘景《答谢中书书》</th><th>苏轼《记承天寺夜游》</th></tr></thead>
+    <tbody>
+      <tr><th>看什么</th><td><span>高峰入云，清流见底……山川四时</span></td><td><span>庭下如积水空明……深夜小院</span></td></tr>
+      <tr><th>什么时候</th><td><span>一日之内（晓雾将歇、夕日欲颓）</span></td><td><span>元丰六年十月十二日夜（农历十月，初冬）</span></td></tr>
+      <tr><th>看的方式</th><td><span>上下远近、四时俱备，全景观照</span></td><td><span>由月色入户而入，静中方寸之间</span></td></tr>
+      <tr><th>落笔的句子</th><td><span class="red">实是欲界之仙都</span></td><td><span class="red">但少闲人如吾两人者耳</span></td></tr>
+      <tr><th>心里的声音</th><td><span>自康乐以来，未复有能与其奇者</span></td><td><span>何夜无月？何处无竹柏？</span></td></tr>
+    </tbody>
+  </table>
+  <div style="margin-top:18px"><button class="mini-btn" data-revealall>全部揭示</button><button class="mini-btn" data-hideall>全部隐藏</button><button class="mini-btn" onclick="App.pick()">随机抽一组汇报（R）</button><button class="mini-btn" onclick="App.timerSet(300,true)">小组讨论计时 5 分钟</button></div>
+  <div class="notes">
+    <h4>教师活动</h4>
+    <ul><li>出示任务卡，四人小组合作，5 分钟完成（可点“小组讨论计时 5 分钟”）。</li>
+    <li>小组汇报时，逐格点击揭示，与学生答案对照。</li>
+    <li>汇报后聚焦两个关键句（后两页）。</li></ul>
+    <h4>预设应对</h4>
+    <p>若时间紧张：改为两列并读、师生共建，压缩小组汇报时间。</p>
+    <p>若学生只说“都写景”：追问“都写景，为什么一篇要写尽大山四时，一篇只写一个小院子？”把“量”的差异引向“心”的差异。</p>
+  </div>
+</section>
+
+<!-- ======================= 13 关键句一 ======================= -->
+<section class="slide" data-sec="3" data-title="关键句 · 欲界之仙都">
+  <div class="tag"><b>环节三</b>比读 · 关键句一</div>
+  <p class="quote green" style="text-align:center;margin:10px 0 30px;font-size:66px">实是欲界之仙都</p>
+  <div class="card" style="margin-bottom:20px"><p><span class="red">问题 1</span>　陶弘景在宣告什么？</p><p class="frag kai" style="margin-left:2em">——这里就是人间仙境。</p></div>
+  <div class="card" style="margin-bottom:20px"><p class="frag"><span class="red">追问</span>　他为什么非要说给谢灵运（康乐）听？</p><p class="frag kai" style="margin-left:2em">——他觉得自己懂这个美，够格做谢灵运的知音。</p></div>
+  <p class="frag" style="font-size:34px;text-align:center;margin-top:10px">向外走的人，用一座大山<span class="red">确认自己的存在</span>——<br><span class="kai">我能看见这样的美，我就是这样的人。</span></p>
+  <div class="notes">
+    <h4>补充</h4><p>谢灵运（385—433），南朝宋诗人，中国山水诗派的开创者，袭封康乐公，世称“谢康乐”。“自康乐以来，未复有能与其奇者”——言外之意：如今，能欣赏它的就是我。</p>
+    <h4>设计意图</h4><p>让“向外”从形式（写大山）落到精神（自我确认、自我标榜）。</p>
+  </div>
+</section>
+
+<!-- ======================= 14 关键句二：投票 ======================= -->
+<section class="slide" data-sec="3" data-title="关键句 · 闲人">
+  <div class="tag"><b>环节三</b>比读 · 关键句二</div>
+  <p class="quote blue" style="text-align:center;margin:10px 0 24px;font-size:60px">但少闲人如吾两人者耳</p>
+  <p style="text-align:center;font-size:36px;margin-bottom:24px"><span class="red">问题 2</span>　“闲人”，是<b>屈辱</b>还是<b>骄傲</b>？举手表决！</p>
+  <div class="vote" id="vote">
+    <button data-v="0"><span>屈　辱</span><span class="n">0</span></button>
+    <button data-v="1"><span>骄　傲</span><span class="n">0</span></button>
+    <button data-v="2"><span>都　有</span><span class="n">0</span></button>
+  </div>
+  <div class="bar"><i style="background:#8a7f72;width:33.3%"></i><i style="background:var(--red);width:33.3%"></i><i style="background:var(--gold);width:33.4%"></i></div>
+  <p style="margin-top:8px"><button class="mini-btn" data-votereset>清零</button><span class="mute" style="font-size:20px">点击按钮 +1，右键 −1</span></p>
+  <div class="card frag" style="margin-top:20px"><p style="font-size:28px">在宋代，被贬就是“闲人”——没有权力，没有地位。苏轼把这个屈辱的身份<span class="red">翻转</span>过来了：恰恰因为我是闲人，才能看见你们这些忙人看不见的东西。<span class="kai">你们忙着争权夺利，我忙着欣赏月光。</span></p></div>
+  <div class="notes">
+    <h4>预设</h4><p>生（可能分歧）：“被贬没有权力，是屈辱；但他能看月光，又好像是幸运、骄傲。”——分歧正是好资源，请双方各说理由。</p>
+    <h4>预设应对</h4><p>若学生不理解“闲人”：生活化类比——“你晚上做完作业能去看月亮吗？能看见月亮的人多不多？”</p>
+    <h4>补充</h4><p>“闲人”的复杂意味：自嘲（被贬无事）、自慰（得以赏月）、自傲（不汲汲于名利）、自适（豁达）。</p>
+  </div>
+</section>
+
+<!-- ======================= 15 小结 ======================= -->
+<section class="slide center" data-sec="3" data-title="比读小结">
+  <div class="tag"><b>环节三</b>比读 · 小结</div>
+  <div class="row" style="width:100%;gap:80px">
+    <div class="col frag" style="text-align:center"><p class="big green" style="font-size:60px">把山写得那么大</p><p>要把世界纳入眼底</p><p class="quote green" style="margin-top:30px;font-size:44px">热腾腾的宣告</p></div>
+    <div class="col frag" style="text-align:center"><p class="big blue" style="font-size:60px">把小院写得那么满</p><p>要在方寸之间安顿自己</p><p class="quote blue" style="margin-top:30px;font-size:44px">静悄悄的懂得</p></div>
+  </div>
+  <div class="notes">
+    <h4>师小结（板书收束对比）</h4>
+    <p class="sv">“一个把山写得那么大，要把世界纳入眼底；一个把小院写得那么满，要在方寸之间安顿自己。一个是热腾腾的宣告，一个是静悄悄的懂得。”</p>
+  </div>
+</section>
+
+<!-- ======================= 16 深读：为什么 ======================= -->
+<section class="slide center" data-sec="4" data-title="为什么非看风景不可">
+  <div class="tag"><b>环节四</b>深读 · 读懂“美是一种抵抗”</div>
+  <p class="big" style="font-size:72px">他们为什么<br>非要<span class="red">“看风景”</span>不可？</p>
+  <div class="notes">
+    <h4>操作</h4><p>停顿，给学生思考时间（约 30 秒），再出示背景。背景只讲两三句，不做冗长讲解。</p>
+  </div>
+</section>
+
+<!-- ======================= 17 背景卡 ======================= -->
+<section class="slide" data-sec="4" data-title="背景卡">
+  <div class="tag"><b>环节四</b>深读 · 背景</div>
+  <h2>风景背后，是怎样的人生？</h2>
+  <div class="row grow">
+    <div class="col card out frag">
+      <h3 class="green">陶弘景 · 退进山水</h3>
+      <p>历经宋、齐、梁三朝。南朝政权更迭频繁，宫廷杀戮不断。</p>
+      <p style="margin-top:12px">做官，意味着随时可能被卷入<span class="red">政治的绞肉机</span>。</p>
+      <p style="margin-top:12px">三十六岁，他上表辞官，挂朝服于神武门，归隐茅山。</p>
+    </div>
+    <div class="col card in frag">
+      <h3 class="blue">苏轼 · 困于黄州</h3>
+      <p>1079 年乌台诗案：因诗文被指“讥讽朝政”，下狱一百三十余日，<span class="red">九死一生</span>。</p>
+      <p style="margin-top:12px">贬黄州团练副使，连签公文的权力都没有，生活困顿，躬耕东坡。</p>
+      <p style="margin-top:12px">“闲人”二字，本是屈辱。</p>
+    </div>
+  </div>
+  <div class="notes">
+    <h4>补充资料</h4>
+    <p>苏轼在黄州写下《念奴娇·赤壁怀古》、前后《赤壁赋》《定风波》等名篇。“东坡”之号即得于此——他在城东一块坡地上开荒种地。</p>
+    <p>张怀民同样是贬官，初到黄州寓居承天寺。所以“吾两人”是同病相怜，也是心意相通。</p>
+  </div>
+</section>
+
+<!-- ======================= 18 两种退 ======================= -->
+<section class="slide" data-sec="4" data-title="魏晋之退 / 宋代之退">
+  <div class="tag"><b>环节四</b>深读 · 对照</div>
+  <h2>同样是“退”，退得一样吗？</h2>
+  <div class="row grow">
+    <div class="col card out frag">
+      <h3 class="green">魏晋南北朝之退</h3>
+      <ul style="padding-left:1.1em">
+        <li>刘伶纵酒，阮籍猖狂</li>
+        <li>嵇康刑场，弹一曲《广陵散》</li>
+        <li>陶弘景挂冠，归隐茅山</li>
+      </ul>
+      <p style="margin-top:20px;font-size:40px" class="kai green">悲壮 · 决绝</p>
+      <p>向外标榜：“<b>我偏不</b>。”</p>
+    </div>
+    <div class="col card in frag">
+      <h3 class="blue">宋代之退</h3>
+      <ul style="padding-left:1.1em">
+        <li>苏轼解衣欲睡，被月色吸引而起行</li>
+        <li>去找一位朋友，一起散步</li>
+        <li>躬耕东坡，“一蓑烟雨任平生”</li>
+      </ul>
+      <p style="margin-top:20px;font-size:40px" class="kai blue">从容 · 温润</p>
+      <p>向内安顿：“<b>我还能看</b>。”</p>
+    </div>
+  </div>
+  <div class="notes">
+    <h4>说明</h4><p>“刘伶、阮籍、嵇康”属魏晋“竹林七贤”，陶弘景是南朝人，此处借几位人物作比较；“悲壮／从容”是本课的阐释角度，不能概括整个时代，也不能替代具体文本证据。陶弘景与梁武帝仍有联系，不宜把他的归隐理解为与现实完全决裂。</p>
+    <p>可简述：嵇康临刑，神色不变，索琴弹《广陵散》，曲终叹“《广陵散》于今绝矣”。</p>
+  </div>
+</section>
+
+<!-- ======================= 19 中心句 ======================= -->
+<section class="slide center" data-sec="4" data-title="美，是最温柔的抵抗">
+  <div class="tag"><b>环节四</b>深读 · 中心句</div>
+  <p class="big frag" style="font-size:88px">美，是最温柔的<span class="red">抵抗</span>。</p>
+  <div class="row frag" style="margin-top:40px;gap:100px"><p style="font-size:36px"><span class="green">向外走</span>，是悲壮的抵抗；</p><p style="font-size:36px"><span class="blue">向内走</span>，是温柔的抵抗。</p></div>
+  <div class="divider frag"></div>
+  <p class="quote frag" style="font-size:46px">你们可以摧毁我的生活，<br>但不能定义我的生命。</p>
+  <div class="notes">
+    <h4>师收束</h4>
+    <p class="sv">“美，是最温柔的抵抗。向外走，是悲壮的抵抗；向内走，是温柔的抵抗。他们都在说：你们可以摧毁我的生活，但不能定义我的生命。”</p>
+    <h4>设计意图</h4><p>从文本细节走向历史与人的选择，让“美作为抵抗”从口号变成两种可触摸的活法，突破难点。</p>
+  </div>
+</section>
+
+<!-- ======================= 20 升华 ======================= -->
+<section class="slide" data-sec="5" data-title="回到那个问题">
+  <div class="tag"><b>环节五</b>升华 · 今天为什么读</div>
+  <h2>现在，你能回答了吗？</h2>
+  <p style="font-size:36px;margin-bottom:30px">为什么把这两篇编入<span class="red">同一课</span>？</p>
+  <div class="row">
+    <div class="col card frag"><h3>它们是一组对照</h3><p>一个向外，一个向内。</p></div>
+    <div class="col card frag"><h3>它们是同一种选择</h3><p>都是用美，抵抗世界。</p></div>
+    <div class="col card frag"><h3>它们是两条路</h3><p>让我们看见中国文人精神的两种安顿方式。</p></div>
+  </div>
+  <div class="notes">
+    <h4>操作</h4><p>请学生先说，再逐条出示。尽量用学生原话归纳。</p>
+  </div>
+</section>
+
+<!-- ======================= 21 与我何干 ======================= -->
+<section class="slide center" data-sec="5" data-title="与我们的生活">
+  <div class="tag"><b>环节五</b>升华 · 今天为什么读</div>
+  <div class="moon" style="left:140px;top:120px;width:110px;height:110px"></div>
+  <p class="frag" style="font-size:36px;line-height:2">我们也许还没经历过真正的黑暗，<br>但会有考试失利、被人误解、被生活“欺骗”的时刻。</p>
+  <p class="frag" style="font-size:36px;margin-top:30px">那时，如果能想起</p>
+  <p class="frag quote" style="margin-top:10px"><span class="blue">“庭下如积水空明”</span>　<span class="green">“实是欲界之仙都”</span></p>
+  <p class="frag" style="font-size:40px;margin-top:40px">你就会知道：人在最坏的时候，<span class="red">依然可以选择看见美</span>。</p>
+  <div class="notes">
+    <h4>说明</h4><p>语速放慢，留白。这是把古人的选择引向学生当下的生命体验，“不止于知”。</p>
+  </div>
+</section>
+
+<!-- ======================= 22 结课齐读 ======================= -->
+<section class="slide" data-sec="5" data-title="结课齐读">
+  <div class="tag"><b>环节五</b>结课齐读</div>
+  <h2>选一句最打动你的，我们一起读</h2>
+  <div class="row grow" style="align-items:center">
+    <div class="col">
+      <p class="quote green" style="font-size:40px">高峰入云，清流见底。</p>
+      <p class="quote green" style="font-size:40px">晓雾将歇，猿鸟乱鸣；<br>夕日欲颓，沉鳞竞跃。</p>
+      <p class="quote green" style="font-size:40px">实是欲界之仙都。</p>
+    </div>
+    <div class="col">
+      <p class="quote blue" style="font-size:40px">月色入户，欣然起行。</p>
+      <p class="quote blue" style="font-size:40px">庭下如积水空明。</p>
+      <p class="quote blue" style="font-size:40px">何夜无月？何处无竹柏？<br>但少闲人如吾两人者耳。</p>
+    </div>
+  </div>
+  <div class="notes">
+    <h4>操作</h4><p>请每位学生选最能打动自己的一句，可请两三位说说为什么；然后全班齐读，在诵读声中收束。</p>
+  </div>
+</section>
+
+<!-- ======================= 23 课堂小测 ======================= -->
+<section class="slide" data-sec="6" data-title="课堂小测">
+  <div class="tag"><b>环节六</b>收束 · 课堂小测（补充）</div>
+  <h2 style="margin-bottom:24px">检测一下 <small>点击选项作答</small></h2>
+  <div class="quiz">
+    <div class="q"><div class="stem">1. “未复有能<b>与</b>其奇者”中“与”的读音和意思是：</div>
+      <div class="opts"><button>yǔ，给予</button><button data-ok>yù，参与，指欣赏</button><button>yú，语气词</button></div>
+      <div class="why">“与”读 yù，参与。“与其奇”即欣赏这奇丽的景色。</div></div>
+    <div class="q"><div class="stem">2. “<b>盖</b>竹柏影也”中“盖”的意思是：</div>
+      <div class="opts"><button>覆盖</button><button>发语词，无实义</button><button data-ok>大概是，表推测</button></div>
+      <div class="why">“盖”表推测，写出苏轼由错觉到恍然的过程。</div></div>
+    <div class="q"><div class="stem">3. “庭下如积水空明”主要运用了什么手法写月光？</div>
+      <div class="opts"><button data-ok>比喻，以水喻月光</button><button>夸张</button><button>拟人</button></div>
+      <div class="why">把月光比作积水，再把竹柏影比作藻荇，这段景物描写不直接写“月”字，却让人感到月色满庭。</div></div>
+    <div class="q"><div class="stem">4. 下列对两文理解不正确的一项是：</div>
+      <div class="opts"><button>陶文从仰、俯、色彩、动静多角度写山川</button><button data-ok>“闲人”只表达苏轼被贬后的悲伤失意</button><button>两文都借写景表达作者的心境</button></div>
+      <div class="why">“闲人”含义复杂：有自嘲、自慰，更有不汲汲于名利、从容赏美的自得与豁达。</div></div>
+  </div>
+  <div class="notes">
+    <h4>说明</h4><p>对应教学设计“即时评价”。若时间不够可留作课后自测，或只做第 4 题。</p>
+  </div>
+</section>
+
+<!-- ======================= 24 板书 ======================= -->
+<section class="slide center" data-sec="6" data-title="板书设计">
+  <div class="tag"><b>环节六</b>收束 · 板书</div>
+  <div class="board" style="width:1300px">
+    <div class="t">美，是一种抵抗</div>
+    <div class="r frag"><span>向外走（陶弘景）</span><span class="a">山川</span><span>以美标榜自身</span><span>→ 悲壮的抵抗</span></div>
+    <div class="r frag"><span>向内走（苏　轼）</span><span class="a">小院</span><span>以美安顿自己</span><span>→ 温柔的抵抗</span></div>
+    <div class="b frag">你们可以摧毁我的生活，但不能定义我的生命</div>
+  </div>
+  <div class="notes">
+    <h4>收束语</h4><p>简要回顾“向外／向内—两种抵抗—看见美”的路径。</p>
+  </div>
+</section>
+
+<!-- ======================= 25 作业 ======================= -->
+<section class="slide" data-sec="6" data-title="课后任务">
+  <div class="tag"><b>环节六</b>课后任务</div>
+  <h2>课后任务</h2>
+  <div class="card" style="margin-bottom:24px"><h3><span class="seal" style="margin-right:14px">必做</span>背诵并默写两文。</h3></div>
+  <div class="card">
+    <h3><span class="seal" style="margin-right:14px">选做</span>三选一</h3>
+    <ol style="padding-left:1.4em">
+      <li>给苏轼或陶弘景写一段话，说说你想对他说的心里话。</li>
+      <li>记录今晚的一处“月景”或身边的小景，<b>用一句文言</b>写下来。<span class="mute" style="font-size:24px">（能借景传情即可，不苛求工整）</span></li>
+      <li>补充一位你心中“以美抵抗”的人，并说明理由。</li>
+    </ol>
+  </div>
+  <div class="notes">
+    <h4>评价要点</h4><p>选做②能借景传情即可，不苛求工整。作为“文言小景”表现性评价的落点。</p>
+  </div>
+</section>
+
+<!-- ======================= 26 拓展阅读 ======================= -->
+<section class="slide" data-sec="6" data-title="拓展阅读">
+  <div class="tag"><b>附</b>拓展阅读（补充）</div>
+  <h2>还想多读一点？</h2>
+  <div class="row grow">
+    <div class="col card out">
+      <h3>陶弘景《诏问山中何所有赋诗以答》</h3>
+      <p class="quote" style="font-size:40px;margin-top:10px">山中何所有？<br>岭上多白云。<br>只可自怡悦，<br>不堪持赠君。</p>
+      <p class="mute" style="font-size:22px;margin-top:10px">以山中白云表达自得其乐、不慕仕进的志趣。</p>
+    </div>
+    <div class="col card in">
+      <h3>苏轼《定风波》（节选）</h3>
+      <p class="quote" style="font-size:36px;margin-top:10px">莫听穿林打叶声，何妨吟啸且徐行。竹杖芒鞋轻胜马，谁怕？<br>一蓑烟雨任平生。</p>
+      <p class="mute" style="font-size:22px;margin-top:10px">元丰五年作于黄州，比夜游承天寺早一年。</p>
+    </div>
+  </div>
+  <div class="notes"><h4>说明</h4><p>供学有余力的学生课后阅读，可与选做作业③结合。</p></div>
+</section>
+
+</div></div>
+
+<!-- 工具条 -->
+<div id="hud">
+  <a href="../../index.html" title="返回课堂课件资料库">课件目录</a>
+  <button onclick="App.go(App.i-1)">◀ 上一页</button>
+  <button onclick="App.next()">下一步 ▶</button>
+  <span id="count">1 / 1</span>
+  <span id="secname"></span>
+  <span class="sp"></span>
+  <span id="timer" title="本环节剩余时间（T 开始/暂停，双击重置）">05:00</span>
+  <button onclick="App.timerToggle()" id="tbtn">▶ 计时</button>
+  <span title="全课已用时">全课 <span id="total">00:00</span></span>
+  <button onclick="App.pick()">随机抽组</button>
+  <button onclick="App.toggle('toc-on')">目录</button>
+  <button onclick="App.toggle('notes-on')">教师备注</button>
+  <button onclick="App.fullscreen()">全屏</button>
+  <button onclick="App.toggle('help-on')">?</button>
+</div>
+
+<aside id="notes"></aside>
+<div id="toc"><h4>目　录　（按 M 或 Esc 关闭）</h4><div class="list"></div></div>
+<div id="picker"><div class="num">?</div><div class="lbl">号小组</div>
+  <div class="ctl">共 <input type="number" id="groups" value="10" min="2" max="30"> 组 <button onclick="App.pick()">再抽一次</button><button onclick="App.toggle('pick-on')">关闭</button></div></div>
+<div id="help"><table>
+  <tr><td><kbd>→</kbd> <kbd>空格</kbd> <kbd>PgDn</kbd> / 点击右侧</td><td>下一步（先逐条显示动画）</td></tr>
+  <tr><td><kbd>←</kbd> <kbd>PgUp</kbd></td><td>上一页</td></tr>
+  <tr><td><kbd>N</kbd></td><td>教师备注（教学活动、预设、设计意图）</td></tr>
+  <tr><td><kbd>M</kbd></td><td>目录跳转</td></tr>
+  <tr><td><kbd>T</kbd></td><td>环节计时 开始/暂停（双击时间重置）</td></tr>
+  <tr><td><kbd>R</kbd></td><td>随机抽小组</td></tr>
+  <tr><td><kbd>G</kbd></td><td>原文注释下划线 显示/隐藏</td></tr>
+  <tr><td><kbd>F</kbd></td><td>全屏</td></tr>
+  <tr><td><kbd>H</kbd></td><td>隐藏/显示底部工具条</td></tr>
+  <tr><td><kbd>Esc</kbd></td><td>关闭弹层</td></tr>
+  <tr><td colspan="2" class="mute" style="color:#9a8f80">点击任意处关闭</td></tr>
+</table></div>
+<div id="pop"></div>
+
+<script>
+const App = (() => {
+  const SECTIONS = [
+    {name:'课前', min:0},
+    {name:'环节一 · 导入', min:5},
+    {name:'环节二 · 初读', min:8},
+    {name:'环节三 · 比读', min:15},
+    {name:'环节四 · 深读', min:10},
+    {name:'环节五 · 升华', min:5},
+    {name:'环节六 · 收束', min:2},
+  ];
+  const slides = [...document.querySelectorAll('.slide')];
+  const $ = s => document.querySelector(s);
+  const body = document.body;
+  const app = { i: 0 };
+
+  /* ---------- 缩放 ---------- */
+  function fit(){
+    const hud = body.classList.contains('hud-hide') ? 0 : 52;
+    const s = Math.min(innerWidth/1600, (innerHeight-hud)/900);
+    $('#stage').style.transform = `scale(${s})`;
+    $('#viewport').style.bottom = hud + 'px';
+  }
+  addEventListener('resize', fit);
+
+  /* ---------- 翻页 ---------- */
+  function go(n, fromHash){
+    n = Math.max(0, Math.min(slides.length-1, n));
+    const prevSec = slides[app.i].dataset.sec;
+    slides.forEach((s,k)=>{ s.classList.toggle('active',k===n); s.classList.toggle('past',k<n); });
+    app.i = n;
+    const sl = slides[n], sec = +sl.dataset.sec;
+    $('#count').textContent = `${n+1} / ${slides.length}`;
+    $('#secname').textContent = SECTIONS[sec].name + ' · ' + sl.dataset.title;
+    $('#progress').style.width = ((n+1)/slides.length*100) + '%';
+    $('#notes').innerHTML = `<h4 style="color:#8a7f72">第 ${n+1} 页 · ${sl.dataset.title}</h4>` + (sl.querySelector('.notes')?.innerHTML || '<p class="mute">（本页无备注）</p>');
+    if (String(sec) !== prevSec && SECTIONS[sec].min) timerSet(SECTIONS[sec].min*60, timer.running);
+    if (!fromHash) history.replaceState(null,'','#'+(n+1));
+    hidePop();
+    renderToc();
+  }
+  function next(){
+    const f = slides[app.i].querySelector('.frag:not(.on)');
+    if (f) { f.classList.add('on'); return; }
+    go(app.i+1);
+  }
+  function prev(){ go(app.i-1); }
+
+  /* ---------- 计时 ---------- */
+  const timer = { left: 300, running:false, h:null, start: null, total:0 };
+  function fmt(s){ const neg = s<0; s=Math.abs(s); return (neg?'-':'')+String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+  function drawTimer(){
+    const el = $('#timer'); el.textContent = fmt(timer.left);
+    el.classList.toggle('warn', timer.left<=60 && timer.left>0);
+    el.classList.toggle('over', timer.left<=0);
+    $('#tbtn').textContent = timer.running ? '❚❚ 暂停' : '▶ 计时';
+    $('#total').textContent = fmt(timer.total);
+  }
+  function tick(){ timer.left--; timer.total++; drawTimer(); }
+  function timerToggle(){
+    timer.running = !timer.running;
+    clearInterval(timer.h);
+    if (timer.running) timer.h = setInterval(tick, 1000);
+    drawTimer();
+  }
+  function timerSet(sec, keepRunning){
+    timer.left = sec;
+    if (keepRunning && !timer.running) timerToggle();
+    drawTimer();
+  }
+  $('#timer').addEventListener('dblclick', ()=>timerSet(SECTIONS[+slides[app.i].dataset.sec].min*60 || 300));
+
+  /* ---------- 注释弹窗 ---------- */
+  const pop = $('#pop');
+  function showPop(el){
+    document.querySelectorAll('.g.sel').forEach(x=>x.classList.remove('sel'));
+    el.classList.add('sel');
+    pop.innerHTML = `<span class="w">${el.dataset.w}</span>${el.dataset.p?`<span class="py">${el.dataset.p}</span>`:''}<br>${el.dataset.n}`;
+    const r = el.getBoundingClientRect();
+    pop.classList.add('on');
+    const pw = pop.offsetWidth, ph = pop.offsetHeight;
+    let x = Math.min(innerWidth-pw-10, Math.max(10, r.left + r.width/2 - pw/2));
+    let y = r.top - ph - 10; if (y < 10) y = r.bottom + 10;
+    pop.style.left = x+'px'; pop.style.top = y+'px';
+  }
+  function hidePop(){ pop.classList.remove('on'); document.querySelectorAll('.g.sel').forEach(x=>x.classList.remove('sel')); }
+
+  /* ---------- 目录 ---------- */
+  function renderToc(){
+    $('#toc .list').innerHTML = slides.map((s,k)=>`<button data-go="${k}" class="${k===app.i?'cur':''}"><span class="s">${k+1} · ${SECTIONS[+s.dataset.sec].name}</span>${s.dataset.title}</button>`).join('');
+  }
+  $('#toc').addEventListener('click', e=>{
+    const b = e.target.closest('[data-go]');
+    if (b){ go(+b.dataset.go); body.classList.remove('toc-on'); }
+  });
+
+  /* ---------- 随机抽组 ---------- */
+  function pick(){
+    body.classList.add('pick-on');
+    const n = Math.max(2, +$('#groups').value || 10);
+    const el = $('#picker .num'); let k = 0;
+    const h = setInterval(()=>{
+      el.textContent = 1 + Math.floor(Math.random()*n);
+      if (++k > 16){ clearInterval(h); }
+    }, 60);
+  }
+
+  /* ---------- 投票 ---------- */
+  const votes = [0,0,0];
+  function drawVote(){
+    const btns = document.querySelectorAll('#vote button');
+    btns.forEach((b,k)=>b.querySelector('.n').textContent = votes[k]);
+    const sum = votes.reduce((a,b)=>a+b,0);
+    document.querySelectorAll('.bar i').forEach((b,k)=>b.style.width = (sum ? votes[k]/sum*100 : 100/3)+'%');
+  }
+  document.querySelectorAll('#vote button').forEach(b=>{
+    b.addEventListener('click', e=>{ e.stopPropagation(); votes[+b.dataset.v]++; drawVote(); });
+    b.addEventListener('contextmenu', e=>{ e.preventDefault(); e.stopPropagation(); const k=+b.dataset.v; votes[k]=Math.max(0,votes[k]-1); drawVote(); });
+  });
+
+  /* ---------- 通用点击 ---------- */
+  function toggle(cls){ body.classList.toggle(cls); if (cls==='hud-hide') fit(); }
+  function fullscreen(){
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+    else document.exitFullscreen?.();
+  }
+
+  document.addEventListener('click', e=>{
+    const t = e.target;
+    if (body.classList.contains('help-on')){ body.classList.remove('help-on'); return; }
+    const g = t.closest('.g'); if (g){ g.classList.contains('sel') ? hidePop() : showPop(g); return; }
+    hidePop();
+    const fl = t.closest('.flip'); if (fl){ fl.classList.toggle('turned'); return; }
+    const bl = t.closest('.blank'); if (bl){ bl.classList.toggle('on'); return; }
+    const td = t.closest('table.cmp td'); if (td){ td.classList.toggle('on'); return; }
+    if (t.closest('[data-revealall]')){ slides[app.i].querySelectorAll('table.cmp td').forEach(x=>x.classList.add('on')); return; }
+    if (t.closest('[data-hideall]')){ slides[app.i].querySelectorAll('table.cmp td').forEach(x=>x.classList.remove('on')); return; }
+    const tr = t.closest('[data-trans]'); if (tr){ document.getElementById(tr.dataset.trans).classList.toggle('show'); return; }
+    if (t.closest('[data-allg]')){ body.classList.toggle('hide-g'); return; }
+    if (t.closest('[data-votereset]')){ votes.fill(0); drawVote(); return; }
+    const opt = t.closest('.q .opts button');
+    if (opt){
+      const q = opt.closest('.q');
+      if (opt.hasAttribute('data-ok')){ opt.classList.add('right'); q.classList.add('done'); }
+      else { opt.classList.remove('wrong'); void opt.offsetWidth; opt.classList.add('wrong'); }
+      return;
+    }
+    const fr = t.closest('.frag:not(.on)'); if (fr){ fr.classList.add('on'); return; }
+    // 点击舞台空白：右侧 2/3 前进，左侧 1/3 后退
+    if (t.closest('#stage') && !t.closest('button,.card,.text,.trans,table,.vote')){
+      (e.clientX > innerWidth/3) ? next() : prev();
+    }
+  });
+
+  document.addEventListener('keydown', e=>{
+    if (e.target.tagName === 'INPUT') return;
+    const k = e.key;
+    if (k==='Escape'){ ['toc-on','pick-on','help-on','notes-on'].forEach(c=>body.classList.remove(c)); hidePop(); return; }
+    if (['ArrowRight','PageDown',' ','Enter'].includes(k)){ e.preventDefault(); next(); }
+    else if (['ArrowLeft','PageUp','Backspace'].includes(k)){ e.preventDefault(); prev(); }
+    else if (k==='Home') go(0);
+    else if (k==='End') go(slides.length-1);
+    else if (/^[nN]$/.test(k)) toggle('notes-on');
+    else if (/^[mM]$/.test(k)) toggle('toc-on');
+    else if (/^[tT]$/.test(k)) timerToggle();
+    else if (/^[rR]$/.test(k)) pick();
+    else if (/^[gG]$/.test(k)) body.classList.toggle('hide-g');
+    else if (/^[fF]$/.test(k)) fullscreen();
+    else if (/^[hH]$/.test(k)) toggle('hud-hide');
+    else if (k==='?') toggle('help-on');
+  });
+
+  // 触屏滑动
+  let sx = null;
+  addEventListener('touchstart', e=>{ sx = e.touches[0].clientX; }, {passive:true});
+  addEventListener('touchend', e=>{
+    if (sx===null) return; const dx = e.changedTouches[0].clientX - sx; sx = null;
+    if (Math.abs(dx) > 60) (dx < 0 ? next() : prev());
+  });
+  addEventListener('hashchange', ()=>{ const n = parseInt(location.hash.slice(1))-1; if (!isNaN(n) && n!==app.i) go(n,true); });
+
+  Object.assign(app, { go, next, prev, timerToggle, timerSet, pick, toggle, fullscreen });
+  fit();
+  const start = parseInt(location.hash.slice(1))-1;
+  go(isNaN(start) ? 0 : start, true);
+  timerSet((SECTIONS[+slides[app.i].dataset.sec].min || 5)*60);
+  return app;
+})();
+</script>
+</body>
+</html>
