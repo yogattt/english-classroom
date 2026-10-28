@@ -43,6 +43,27 @@
         "范文精讲"
       ],
       "href": "papers/gaokao-2027-advice-letter/index.html"
+    },
+    {
+      "id": "meishi-dikang",
+      "title": "美，是一种抵抗 ·《短文两篇》联读",
+      "subject": "语文",
+      "grade": "八年级",
+      "term": "八年级上册 · 第三单元",
+      "addedOn": "2026-10-28",
+      "description": "联读陶弘景《答谢中书书》与苏轼《记承天寺夜游》，从朗读正音、词句赏析到对比探究，配教师备注与课堂互动。",
+      "scope": "26页投屏课件 · 6个授课环节 · 4道小测与课后任务",
+      "unitCount": 6,
+      "exerciseCount": 4,
+      "hasWriting": true,
+      "tags": [
+        "文言文",
+        "短文两篇",
+        "对比阅读",
+        "写景抒情",
+        "课堂互动"
+      ],
+      "href": "papers/meishi-dikang/index.html"
     }
   ]
 }
