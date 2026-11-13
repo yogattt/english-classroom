@@ -64,6 +64,28 @@
         "课堂互动"
       ],
       "href": "papers/meishi-dikang/index.html"
+    },
+    {
+      "id": "passive-voice-workshop",
+      "title": "被动语态精讲与专项训练",
+      "subject": "英语",
+      "grade": "九年级",
+      "term": "语法专题 · 复习与进阶",
+      "addedOn": "2026-11-13",
+      "description": "从句子视角到真实表达：微缩情境导入、结构与时态工坊、特殊结构辨析、逐题解析和教师提示。",
+      "scope": "14个章节 · 原稿42个练习点＋新增30题 · 2篇语篇与3项表达任务",
+      "unitCount": 14,
+      "exerciseCount": 72,
+      "hasWriting": true,
+      "tags": [
+        "被动语态",
+        "语法专题",
+        "中考复习",
+        "主动与被动",
+        "语篇填空",
+        "写作迁移"
+      ],
+      "href": "papers/passive-voice-workshop/index.html"
     }
   ]
 }
