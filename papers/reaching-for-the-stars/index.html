@@ -57,6 +57,32 @@
   .btn:hover, .jump:hover { border-color: var(--blue); color: var(--blue); }
   .btn[aria-pressed="true"], .btn-primary { color: white; background: var(--navy); border-color: var(--navy); }
   .btn-primary:hover, .btn[aria-pressed="true"]:hover { color: white; background: var(--blue); }
+  .btn:disabled { opacity: .48; cursor: default; }
+  .btn[aria-expanded="true"] { color: white; background: var(--blue); border-color: var(--blue); }
+  .lesson-bar .annotation-tools { display: block; min-height: 0; padding: 0 0 9px; }
+  .annotation-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; }
+  .annotation-tools .btn { min-height: 33px; padding-block: 3px; }
+  .annotation-status { margin: 5px 0 0; font-size: .79rem; color: var(--muted); }
+  html:has(.annotation-tools:not([hidden])) { scroll-padding-top: calc(var(--annotation-bar-height, 108px) + 18px); }
+  .annotation-tools-open .guide { top: calc(var(--annotation-bar-height, 108px) + 14px); max-height: calc(100dvh - var(--annotation-bar-height, 108px) - 26px); }
+  [data-ink-area] { position: relative; }
+  .annotation-ink-target { display: flow-root; }
+  .annotation-ink { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .annotation-drawing .annotation-ink, .annotation-erasing .annotation-ink { pointer-events: auto; touch-action: none; cursor: crosshair; }
+  .annotation-erasing .annotation-ink { cursor: cell; }
+  .annotations-hidden .annotation-ink { visibility: hidden; }
+  .annotation-mark { padding: 0; color: inherit; background: #ffe289; border-radius: 2px; cursor: pointer; }
+  .annotation-mark.has-note { background: #c4e6d9; box-shadow: inset 0 -1px #3e8071; }
+  .annotation-notes { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+  .annotation-notes button { min-height: 29px; padding: 2px 7px; background: #edf4ef; color: #245e53; border-color: #9fbbb0; }
+  .annotation-dialog { width: min(510px, calc(100% - 24px)); padding: 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); }
+  .annotation-dialog::backdrop { background: #14233bb0; }
+  .annotation-dialog h2 { margin-bottom: 9px; font-size: 1.24rem; }
+  .annotation-dialog blockquote { margin: 0 0 12px; max-height: 24vh; overflow: auto; overflow-wrap: anywhere; padding: 7px 10px; border-left: 3px solid #80a39a; background: #f0f4ee; }
+  .annotation-dialog label { display: block; font-size: .88rem; font-weight: 700; }
+  .annotation-dialog textarea { display: block; box-sizing: border-box; width: 100%; margin-top: 5px; padding: 8px; border: 1px solid #afb6b7; border-radius: 6px; background: white; color: var(--ink); font: inherit; resize: vertical; }
+  .annotation-dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; margin-top: 13px; }
+  .annotation-remove { margin-right: auto; color: #862a40; }
   .section { margin-block: 26px; }
   .card { border: 1px solid var(--line); border-radius: 15px; background: var(--card); box-shadow: 0 6px 15px #26334907; }
   h2, h3, p { margin-top: 0; }
@@ -164,6 +190,8 @@
     .wrap { width: calc(100% - 34px); }
     .lesson-bar, .guide { position: static; }
     .guide { max-height: none; }
+    .annotation-tools-open .lesson-bar { position: sticky; }
+    .annotation-tools-open .guide { max-height: none; }
     .reading-layout { grid-template-columns: 1fr; }
     .quiz-list { grid-template-columns: 1fr; }
   }
@@ -190,6 +218,8 @@
     .cover-copy { padding: 0 0 8pt; }
     .cover h1 { font-size: 25pt; color: black; }
     .masthead, .cover-art, .lesson-bar, .reading-tools, .guide-menu, .guide-bottom, #guide-count, .illustration-dialog, .choices input, .illustration-open span { display: none; }
+    .annotation-ink, .annotation-notes, .annotation-dialog { display: none !important; }
+    .annotation-mark, .annotation-mark.has-note { background: transparent; box-shadow: none; }
     .section { margin-block: 12pt; }
     .card, .guide { border: 0; box-shadow: none; padding: 0; }
     .section-head { margin-bottom: 6pt; }
@@ -248,15 +278,30 @@
       <a href="#write">写作迁移</a>
     </nav>
     <div class="display-controls" aria-label="授课工具">
+      <button type="button" class="btn" id="annotation-toggle" aria-expanded="false" aria-controls="annotation-tools">课堂批注</button>
       <button type="button" class="btn btn-primary" id="answer-toggle" aria-pressed="false">展示参考答案</button>
       <button type="button" class="btn" id="print">教师打印</button>
     </div>
+  </div>
+  <div class="wrap annotation-tools" id="annotation-tools" hidden>
+    <div class="annotation-actions" role="group" aria-label="批注工具">
+      <button type="button" class="btn" id="annotation-highlight" disabled>高亮选文</button>
+      <button type="button" class="btn" id="annotation-note" disabled>写批注</button>
+      <button type="button" class="btn" id="annotation-pen" aria-pressed="false">画笔</button>
+      <button type="button" class="btn" id="annotation-eraser" aria-pressed="false">橡皮</button>
+      <button type="button" class="btn" id="annotation-undo" disabled>撤销</button>
+      <button type="button" class="btn" id="annotation-visibility" aria-pressed="true">隐藏批注</button>
+      <button type="button" class="btn" id="annotation-export" disabled>导出</button>
+      <button type="button" class="btn" id="annotation-import">导入</button>
+      <input type="file" id="annotation-file" accept=".json,application/json" hidden>
+    </div>
+    <p class="annotation-status" id="annotation-status" role="status">选中一段原文或译文可高亮、写批注。画笔可在课文、讲解和练习中圈画。</p>
   </div>
 </div>
 <main class="wrap">
   <details id="warmup" class="section card warmup">
     <summary>读前热身 <span>教材 1a / 1b · 预测文本类型</span></summary>
-    <div class="warmup-grid">
+    <div class="warmup-grid" data-ink-area="warmup">
       <section>
         <h3>1a · 你在哪里了解太空？</h3>
         <p class="question" lang="en">Where do you prefer to find information about space exploration? Choose the ones that are true for you.</p>
@@ -321,7 +366,7 @@
           <button type="button" data-paragraph="3" aria-controls="guide-3" aria-pressed="false">第 3 段</button>
           <button type="button" data-paragraph="4" aria-controls="guide-4" aria-pressed="false">第 4 段</button>
         </div>
-        <section class="guide-page" id="guide-1">
+        <section class="guide-page" id="guide-1" data-ink-area="guide-1">
           <h4>从好奇到核心问题</h4>
           <figure class="guide-illustration">
             <button class="illustration-open" type="button" aria-label="放大第 1 段插图" aria-haspopup="dialog">
@@ -368,7 +413,7 @@
             </div>
           </details>
         </section>
-        <section class="guide-page" id="guide-2" hidden>
+        <section class="guide-page" id="guide-2" data-ink-area="guide-2" hidden>
           <h4>用例子和数字说明距离</h4>
           <figure class="guide-illustration">
             <button class="illustration-open" type="button" aria-label="放大第 2 段插图" aria-haspopup="dialog">
@@ -418,7 +463,7 @@
             </div>
           </details>
         </section>
-        <section class="guide-page" id="guide-3" hidden>
+        <section class="guide-page" id="guide-3" data-ink-area="guide-3" hidden>
           <h4>从距离读到生存难题</h4>
           <figure class="guide-illustration">
             <button class="illustration-open" type="button" aria-label="放大第 3 段插图" aria-haspopup="dialog">
@@ -463,7 +508,7 @@
             </div>
           </details>
         </section>
-        <section class="guide-page" id="guide-4" hidden>
+        <section class="guide-page" id="guide-4" data-ink-area="guide-4" hidden>
           <h4>从现实困难过渡到未来设想</h4>
           <figure class="guide-illustration">
             <button class="illustration-open" type="button" aria-label="放大第 4 段插图" aria-haspopup="dialog">
@@ -518,7 +563,7 @@
         </div>
       </aside>
     </div>
-    <div class="card explain">
+    <div class="card explain" data-ink-area="distances">
       <h3>原文里的距离有多远？</h3>
       <figure class="scale">
         <div class="axis" aria-hidden="true">
@@ -545,7 +590,7 @@
       <span class="tip">课件补充 · 先选，再展示参考答案</span>
     </header>
     <div class="quiz-list">
-      <section class="card quiz">
+      <section class="card quiz" data-ink-area="quiz-1">
         <h3 id="q1">1 · 识别文体</h3>
         <p class="question" lang="en">What kind of text is this?</p>
         <div class="choices" role="radiogroup" aria-labelledby="q1" lang="en">
@@ -555,7 +600,7 @@
         </div>
         <div class="answer" hidden><b>B</b> · 作者用实例和数据解释星际旅行。A 的线索应是虚构人物或情节，C 的线索应是某件新近事件。</div>
       </section>
-      <section class="card quiz">
+      <section class="card quiz" data-ink-area="quiz-2">
         <h3 id="q2">2 · 理解数字的作用</h3>
         <p class="question" lang="en">Why does the writer give the distance to Proxima Centauri?</p>
         <div class="choices" role="radiogroup" aria-labelledby="q2" lang="en">
@@ -565,7 +610,7 @@
         </div>
         <div class="answer" hidden><b>C</b> · 第 2 段用 <span lang="en">but</span> 引出距离对比。A 把参照物理解成了飞行目的地，B 是文中未介绍的发射过程。</div>
       </section>
-      <section class="card quiz">
+      <section class="card quiz" data-ink-area="quiz-3">
         <h3 id="q3">3 · 推断作者态度</h3>
         <p class="question" lang="en">How does the writer feel about visiting the stars one day?</p>
         <div class="choices" role="radiogroup" aria-labelledby="q3" lang="en">
@@ -581,7 +626,7 @@
     <header class="section-head">
       <div><div class="kicker" lang="en">WRITING</div><h2>写作迁移</h2></div>
     </header>
-    <article class="card writing">
+    <article class="card writing" data-ink-area="writing">
       <h3>学写科普短段落</h3>
       <ol class="writing-path">
         <li><b>引出问题</b><span>第 1 段 · 从好奇写起</span></li>
@@ -602,6 +647,20 @@
     <img alt="">
     <figcaption></figcaption>
   </figure>
+</dialog>
+<dialog class="annotation-dialog" aria-labelledby="annotation-dialog-title">
+  <form id="annotation-form">
+    <h2 id="annotation-dialog-title">文字批注</h2>
+    <blockquote id="annotation-excerpt"></blockquote>
+    <label id="annotation-text-field">批注内容
+      <textarea id="annotation-text" rows="4" maxlength="800"></textarea>
+    </label>
+    <div class="annotation-dialog-actions">
+      <button type="button" class="btn annotation-remove" id="annotation-remove">删除批注</button>
+      <button type="button" class="btn" id="annotation-close">取消</button>
+      <button type="submit" class="btn btn-primary" id="annotation-save">保存批注</button>
+    </div>
+  </form>
 </dialog>
 <script>
   const illustrationDialog = document.querySelector('.illustration-dialog');
@@ -701,6 +760,547 @@
     disclosureStates = undefined;
   });
   document.querySelector('#print').addEventListener('click', () => window.print());
+</script>
+<script>
+(() => {
+  const lessonId = 'reaching-for-the-stars';
+  const storageKey = 'english-classroom:' + lessonId + ':annotations';
+  const lesson = document.querySelector('main');
+  const bar = document.querySelector('.lesson-bar');
+  const byId = id => document.getElementById('annotation-' + id);
+  const toolbar = byId('tools');
+  const toggle = byId('toggle');
+  const status = byId('status');
+  const highlightButton = byId('highlight');
+  const noteButton = byId('note');
+  const penButton = byId('pen');
+  const eraserButton = byId('eraser');
+  const undoButton = byId('undo');
+  const visibilityButton = byId('visibility');
+  const exportButton = byId('export');
+  const importFile = byId('file');
+  const editor = document.querySelector('.annotation-dialog');
+  const noteText = byId('text');
+  const removeButton = byId('remove');
+  const saveButton = byId('save');
+  const help = status.textContent;
+
+  const anchors = new Map();
+  const noteLists = new Map();
+  lesson.querySelectorAll('.paragraph').forEach(paragraph => {
+    const list = document.createElement('div');
+    list.className = 'annotation-notes';
+    list.setAttribute('role', 'group');
+    list.setAttribute('aria-label', '本段文字批注');
+    list.hidden = true;
+    paragraph.append(list);
+    noteLists.set(paragraph.id, list);
+    paragraph.querySelectorAll('.reading-text, .translation').forEach(target => {
+      const key = paragraph.id + '-' + (target.lang || 'zh-CN');
+      target.dataset.annotationAnchor = key;
+      const surface = document.createElement('div');
+      surface.className = 'annotation-ink-target';
+      surface.dataset.inkArea = key;
+      target.before(surface);
+      surface.append(target);
+      anchors.set(key, {
+        target,
+        paragraph: paragraph.id,
+        text: target.textContent,
+        original: [...target.childNodes].map(node => node.cloneNode(true))
+      });
+    });
+  });
+
+  const surfaces = new Map();
+  const inkResize = new ResizeObserver(entries => {
+    for (const entry of entries) drawSurface(surfaces.get(entry.target.dataset.inkArea));
+  });
+  lesson.querySelectorAll('[data-ink-area]').forEach(area => {
+    const canvas = document.createElement('canvas');
+    canvas.className = 'annotation-ink';
+    canvas.setAttribute('aria-hidden', 'true');
+    area.append(canvas);
+    const surface = { area, canvas, context: canvas.getContext('2d'), strokes: [], key: area.dataset.inkArea };
+    surfaces.set(surface.key, surface);
+    inkResize.observe(area);
+    bindCanvas(surface);
+  });
+  new ResizeObserver(() => {
+    document.documentElement.style.setProperty('--annotation-bar-height', bar.offsetHeight + 'px');
+  }).observe(bar);
+
+  let items = [];
+  let shown = true;
+  let storageAvailable = true;
+  let mode = 'read';
+  let editing;
+  let selected;
+  let drawing;
+  let frame = 0;
+  const history = [];
+
+  function announce(message) {
+    status.textContent = storageAvailable ? message : message + ' 浏览器暂无法自动保存，请导出批注留存。';
+  }
+
+  function envelope() {
+    return { version: 1, lesson: lessonId, shown, items };
+  }
+
+  function parseEntry(entry) {
+    if (!entry || typeof entry.id !== 'string' || !/^[\w-]{1,80}$/.test(entry.id)) return null;
+    const { id, kind } = entry;
+    if (kind === 'ink') {
+      const { area, points } = entry;
+      if (!surfaces.has(area) || !Array.isArray(points) || points.length < 1 || points.length > 1600) return null;
+      if (!points.every(point => Array.isArray(point) && point.length === 2 &&
+          point.every(value => Number.isFinite(value) && value >= 0 && value <= 1))) return null;
+      return { id, kind, area, points };
+    }
+    if (kind !== 'highlight' && kind !== 'note') return null;
+    const { anchor, start, end, quote, note } = entry;
+    if (!anchors.has(anchor) || !Number.isInteger(start) || start < 0 || !Number.isInteger(end) ||
+        typeof quote !== 'string' || !quote.trim() || end - start !== quote.length || quote.length > 2400) return null;
+    if (kind === 'note' && (typeof note !== 'string' || !note.trim() || note.length > 800)) return null;
+    return kind === 'note' ? { id, kind, anchor, start, end, quote, note } : { id, kind, anchor, start, end, quote };
+  }
+
+  function decode(raw) {
+    const data = JSON.parse(raw);
+    if (data?.version !== 1 || data.lesson !== lessonId || !Array.isArray(data.items)) throw Error('unsupported annotations');
+    const parsed = data.items.map(parseEntry);
+    if (parsed.includes(null) || new Set(parsed.map(item => item.id)).size !== parsed.length) throw Error('invalid annotations');
+    return { items: parsed, shown: data.shown !== false };
+  }
+
+  function persist() {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(envelope()));
+      storageAvailable = true;
+    } catch {
+      storageAvailable = false;
+    }
+  }
+
+  function replaceItems(next, message) {
+    history.push(items);
+    if (history.length > 24) history.shift();
+    items = next;
+    persist();
+    render();
+    announce(message);
+  }
+
+  function newId() {
+    return globalThis.crypto?.randomUUID?.() || Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
+  }
+
+  function rangeOffsets(item, anchor) {
+    if (anchor.text.slice(item.start, item.end) === item.quote) return [item.start, item.end];
+    const index = anchor.text.indexOf(item.quote);
+    return index >= 0 && index === anchor.text.lastIndexOf(item.quote) ? [index, index + item.quote.length] : null;
+  }
+
+  function renderText() {
+    const fragmentByParagraph = new Map([...noteLists.keys()].map(id => [id, document.createDocumentFragment()]));
+    for (const [key, anchor] of anchors) {
+      const target = anchor.target;
+      target.replaceChildren(...anchor.original.map(node => node.cloneNode(true)));
+      const entries = [];
+      if (shown) {
+        items.filter(item => item.anchor === key).forEach(item => {
+          const offsets = rangeOffsets(item, anchor);
+          if (offsets) entries.push({ item, start: offsets[0], end: offsets[1] });
+          if (item.kind === 'note') {
+            const chip = document.createElement('button');
+            const sample = item.note.trim().replace(/\s+/g, ' ');
+            chip.type = 'button';
+            chip.className = 'btn';
+            chip.dataset.annotationId = item.id;
+            chip.textContent = '批注 · ' + sample.slice(0, 18) + (sample.length > 18 ? '…' : '');
+            fragmentByParagraph.get(anchor.paragraph).append(chip);
+          }
+        });
+      }
+      if (!entries.length) continue;
+
+      const tree = document.createTreeWalker(target, NodeFilter.SHOW_TEXT);
+      const textNodes = [];
+      while (tree.nextNode()) textNodes.push(tree.currentNode);
+      const focusable = new Set();
+      let offset = 0;
+      for (const node of textNodes) {
+        const from = offset;
+        const to = offset += node.length;
+        const intersecting = entries.filter(entry => entry.start < to && entry.end > from);
+        if (!intersecting.length) continue;
+        const cuts = new Set([from, to]);
+        intersecting.forEach(entry => {
+          cuts.add(Math.max(entry.start, from));
+          cuts.add(Math.min(entry.end, to));
+        });
+        const boundaries = [...cuts].sort((a, b) => a - b);
+        const fragment = document.createDocumentFragment();
+        for (let j = 1; j < boundaries.length; j++) {
+          const start = boundaries[j - 1];
+          const end = boundaries[j];
+          const text = node.data.slice(start - from, end - from);
+          const overlaps = intersecting.filter(entry => entry.start <= start && entry.end >= end);
+          const record = (overlaps.findLast(entry => entry.item.kind === 'note') || overlaps.at(-1))?.item;
+          if (!record) {
+            fragment.append(text);
+            continue;
+          }
+          const mark = document.createElement('mark');
+          mark.className = 'annotation-mark' + (record.kind === 'note' ? ' has-note' : '');
+          mark.dataset.annotationId = record.id;
+          mark.textContent = text;
+          if (record.kind === 'highlight' && !focusable.has(record.id)) {
+            mark.tabIndex = 0;
+            mark.setAttribute('role', 'button');
+            mark.setAttribute('aria-label', '查看高亮 · ' + record.quote);
+            focusable.add(record.id);
+          }
+          fragment.append(mark);
+        }
+        node.replaceWith(fragment);
+      }
+    }
+    for (const [paragraph, list] of noteLists) {
+      list.replaceChildren(fragmentByParagraph.get(paragraph));
+      list.hidden = !list.childElementCount;
+    }
+  }
+
+  function updateButtons() {
+    const canAnnotate = Boolean(selected && mode === 'read');
+    highlightButton.disabled = !canAnnotate;
+    noteButton.disabled = !canAnnotate;
+    undoButton.disabled = !history.length;
+    exportButton.disabled = !items.length;
+    penButton.setAttribute('aria-pressed', mode === 'draw');
+    eraserButton.setAttribute('aria-pressed', mode === 'erase');
+    visibilityButton.setAttribute('aria-pressed', shown);
+    visibilityButton.textContent = shown ? '隐藏批注' : '显示批注';
+    document.body.classList.toggle('annotations-hidden', !shown);
+    document.body.classList.toggle('annotation-drawing', shown && mode === 'draw');
+    document.body.classList.toggle('annotation-erasing', shown && mode === 'erase');
+  }
+
+  function render() {
+    selected = undefined;
+    renderText();
+    for (const [key, surface] of surfaces) {
+      surface.strokes = items.filter(item => item.kind === 'ink' && item.area === key);
+      drawSurface(surface);
+    }
+    updateButtons();
+  }
+
+  function readSelection() {
+    const selection = window.getSelection();
+    if (!selection?.rangeCount || selection.isCollapsed) return;
+    const range = selection.getRangeAt(0);
+    const element = range.startContainer.nodeType === Node.ELEMENT_NODE ?
+      range.startContainer : range.startContainer.parentElement;
+    const target = element?.closest('[data-annotation-anchor]');
+    if (!target?.contains(range.endContainer)) return;
+    const prefix = document.createRange();
+    prefix.selectNodeContents(target);
+    prefix.setEnd(range.startContainer, range.startOffset);
+    const start = prefix.toString().length;
+    prefix.setEnd(range.endContainer, range.endOffset);
+    const end = prefix.toString().length;
+    const anchor = target.dataset.annotationAnchor;
+    const quote = anchors.get(anchor).text.slice(start, end);
+    if (quote.trim()) return { anchor, start, end, quote };
+  }
+
+  function setMode(next) {
+    if (drawing) finishDrawing(false);
+    mode = next === mode ? 'read' : next;
+    if (mode !== 'read') {
+      window.getSelection()?.removeAllRanges();
+      if (!shown) {
+        shown = true;
+        persist();
+        render();
+      }
+    }
+    updateButtons();
+    announce(mode === 'draw' ? '画笔已开启。用鼠标或触控笔圈画，再点一次「画笔」可退出。' :
+      mode === 'erase' ? '橡皮已开启。点一条线可擦除整笔，再点一次「橡皮」可退出。' : help);
+  }
+
+  function openEditor(record) {
+    editing = record;
+    const isHighlight = record.kind === 'highlight';
+    byId('dialog-title').textContent = isHighlight ? '已高亮的文字' : '文字批注';
+    byId('excerpt').textContent = record.quote;
+    byId('text-field').hidden = isHighlight;
+    noteText.value = record.note || '';
+    noteText.required = !isHighlight;
+    saveButton.hidden = isHighlight;
+    removeButton.hidden = !record.id;
+    removeButton.textContent = isHighlight ? '移除高亮' : '删除批注';
+    byId('close').textContent = isHighlight ? '关闭' : '取消';
+    editor.showModal();
+    (isHighlight ? byId('close') : noteText).focus();
+  }
+
+  function drawSurface(surface) {
+    const { canvas, context, strokes } = surface;
+    if (!context) return;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    if (width <= 0 || height <= 0) return;
+    const active = drawing?.surface === surface ? drawing.points : [];
+    const scale = Math.min(devicePixelRatio || 1, 2);
+    const pixelWidth = Math.round(width * scale);
+    const pixelHeight = Math.round(height * scale);
+    if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+      canvas.width = pixelWidth;
+      canvas.height = pixelHeight;
+    }
+    context.setTransform(scale, 0, 0, scale, 0, 0);
+    context.clearRect(0, 0, width, height);
+    context.strokeStyle = context.fillStyle = '#ab2340';
+    context.lineWidth = 3;
+    context.lineJoin = context.lineCap = 'round';
+    for (const points of [...strokes.map(stroke => stroke.points), active]) {
+      if (!points.length) continue;
+      const [x, y] = points[0];
+      context.beginPath();
+      if (points.length === 1) {
+        context.arc(x * width, y * height, 1.5, 0, Math.PI * 2);
+        context.fill();
+        continue;
+      }
+      context.moveTo(x * width, y * height);
+      points.slice(1).forEach(([u, v]) => context.lineTo(u * width, v * height));
+      context.stroke();
+    }
+  }
+
+  function relativePoint(event, canvas) {
+    const box = canvas.getBoundingClientRect();
+    const fraction = value => Math.max(0, Math.min(1, value));
+    return [fraction((event.clientX - box.left) / box.width), fraction((event.clientY - box.top) / box.height)];
+  }
+
+  function appendPoint(event, stroke) {
+    const { canvas } = stroke.surface;
+    const point = relativePoint(event, canvas);
+    const last = stroke.points.at(-1);
+    if (!last || (stroke.points.length < 1600 &&
+        Math.hypot((point[0] - last[0]) * canvas.clientWidth, (point[1] - last[1]) * canvas.clientHeight) > 2)) {
+      stroke.points.push(point);
+    }
+  }
+
+  function finishDrawing(save) {
+    const stroke = drawing;
+    drawing = undefined;
+    cancelAnimationFrame(frame);
+    frame = 0;
+    if (save && stroke.points.length) {
+      replaceItems([...items, { id: newId(), kind: 'ink', area: stroke.surface.key, points: stroke.points }], '圈画已添加。');
+    } else {
+      drawSurface(stroke.surface);
+    }
+  }
+
+  function eraseStroke(point, surface) {
+    const width = surface.canvas.clientWidth;
+    const height = surface.canvas.clientHeight;
+    const [x, y] = point;
+    const hit = surface.strokes.findLast(stroke => stroke.points.some(([u, v], index) => {
+      const [prevX, prevY] = stroke.points[Math.max(0, index - 1)];
+      const dx = (prevX - u) * width;
+      const dy = (prevY - v) * height;
+      const px = (x - u) * width;
+      const py = (y - v) * height;
+      const t = Math.max(0, Math.min(1, (dx * px + dy * py) / (dx * dx + dy * dy || 1)));
+      return Math.hypot(px - t * dx, py - t * dy) <= 13;
+    }));
+    if (hit) replaceItems(items.filter(item => item.id !== hit.id), '已擦除一笔圈画。');
+  }
+
+  function bindCanvas(surface) {
+    const { canvas } = surface;
+    canvas.addEventListener('pointerdown', event => {
+      if (!event.isPrimary || event.button !== 0 || drawing) return;
+      event.preventDefault();
+      if (mode === 'erase') {
+        eraseStroke(relativePoint(event, canvas), surface);
+        return;
+      }
+      if (mode !== 'draw') return;
+      drawing = { surface, pointer: event.pointerId, points: [] };
+      appendPoint(event, drawing);
+      canvas.setPointerCapture(event.pointerId);
+      drawSurface(surface);
+    });
+    canvas.addEventListener('pointermove', event => {
+      if (drawing?.surface !== surface || event.pointerId !== drawing.pointer) return;
+      appendPoint(event, drawing);
+      if (!frame) frame = requestAnimationFrame(() => {
+        frame = 0;
+        drawSurface(surface);
+      });
+    });
+    canvas.addEventListener('pointerup', event => {
+      if (drawing?.surface !== surface || event.pointerId !== drawing.pointer) return;
+      appendPoint(event, drawing);
+      finishDrawing(true);
+    });
+    const cancel = event => {
+      if (drawing?.surface === surface && event.pointerId === drawing.pointer) finishDrawing(false);
+    };
+    canvas.addEventListener('pointercancel', cancel);
+    canvas.addEventListener('lostpointercapture', cancel);
+  }
+
+  document.addEventListener('selectionchange', () => {
+    selected = readSelection();
+    updateButtons();
+  });
+  [highlightButton, noteButton].forEach(button => {
+    button.addEventListener('pointerdown', event => event.preventDefault());
+  });
+  highlightButton.addEventListener('click', () => {
+    if (!selected) return;
+    if (items.some(item => item.kind === 'highlight' && item.anchor === selected.anchor &&
+        item.start === selected.start && item.end === selected.end && item.quote === selected.quote)) {
+      announce('这段文字已经高亮。');
+      return;
+    }
+    shown = true;
+    replaceItems([...items, { ...selected, kind: 'highlight', id: newId() }], '高亮已添加。');
+  });
+  noteButton.addEventListener('click', () => {
+    if (selected) openEditor({ ...selected, kind: 'note' });
+  });
+
+  function openMark(element) {
+    const id = element.closest('[data-annotation-id]')?.dataset.annotationId;
+    const record = items.find(item => item.id === id);
+    if (record) openEditor(record);
+  }
+  lesson.addEventListener('click', event => {
+    if (event.target.closest('mark') && !window.getSelection()?.isCollapsed) return;
+    openMark(event.target);
+  });
+  lesson.addEventListener('keydown', event => {
+    if (!event.target.matches('mark[data-annotation-id]') || !['Enter', ' '].includes(event.key)) return;
+    event.preventDefault();
+    openMark(event.target);
+  });
+  byId('form').addEventListener('submit', event => {
+    event.preventDefault();
+    const note = noteText.value.trim();
+    if (!editing || editing.kind !== 'note' || !note) {
+      noteText.focus();
+      return;
+    }
+    const record = { ...editing, id: editing.id || newId(), note };
+    const next = editing.id ? items.map(item => item.id === record.id ? record : item) : [...items, record];
+    editor.close();
+    shown = true;
+    replaceItems(next, '文字批注已保存。');
+  });
+  removeButton.addEventListener('click', () => {
+    const id = editing?.id;
+    if (!id) return;
+    editor.close();
+    replaceItems(items.filter(item => item.id !== id), '已移除此条批注，可撤销。');
+  });
+  byId('close').addEventListener('click', () => editor.close());
+  editor.addEventListener('close', () => { editing = undefined; });
+
+  toggle.addEventListener('click', () => {
+    toolbar.hidden = !toolbar.hidden;
+    toggle.setAttribute('aria-expanded', !toolbar.hidden);
+    document.body.classList.toggle('annotation-tools-open', !toolbar.hidden);
+    if (toolbar.hidden && mode !== 'read') setMode('read');
+  });
+  penButton.addEventListener('click', () => setMode('draw'));
+  eraserButton.addEventListener('click', () => setMode('erase'));
+  visibilityButton.addEventListener('click', () => {
+    if (drawing) finishDrawing(false);
+    mode = 'read';
+    shown = !shown;
+    persist();
+    render();
+    announce(shown ? '已显示批注。' : '已隐藏批注。');
+  });
+  undoButton.addEventListener('click', () => {
+    if (!history.length) return;
+    items = history.pop();
+    persist();
+    render();
+    announce('已撤销上一次批注操作。');
+  });
+  exportButton.addEventListener('click', () => {
+    const url = URL.createObjectURL(new Blob([JSON.stringify(envelope(), null, 2)], { type: 'application/json' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = lessonId + '-annotations.json';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    announce('已导出批注文件。');
+  });
+  byId('import').addEventListener('click', () => importFile.click());
+  importFile.addEventListener('change', async () => {
+    const file = importFile.files[0];
+    importFile.value = '';
+    if (!file) return;
+    try {
+      if (file.size > 12 * 1024 * 1024) throw Error('file too large');
+      const incoming = decode(await file.text()).items;
+      const known = new Set(items.map(item => item.id));
+      const additions = incoming.filter(item => !known.has(item.id));
+      if (!additions.length) {
+        announce('这个文件没有可新增的批注。');
+        return;
+      }
+      shown = true;
+      replaceItems([...items, ...additions], '已合并导入 ' + additions.length + ' 条批注。');
+    } catch {
+      announce('导入失败。请选择本课件导出的 JSON 批注文件。');
+    }
+  });
+
+  function load(raw) {
+    if (raw === null) {
+      items = [];
+      shown = true;
+    } else {
+      const stored = decode(raw);
+      items = stored.items;
+      shown = stored.shown;
+    }
+  }
+  try {
+    load(localStorage.getItem(storageKey));
+  } catch {
+    storageAvailable = false;
+  }
+  window.addEventListener('storage', event => {
+    if (event.key !== storageKey && event.key !== null) return;
+    try {
+      load(event.newValue);
+      history.length = 0;
+      if (!shown) mode = 'read';
+      render();
+    } catch {
+      announce('当前浏览器中的批注读取失败。');
+    }
+  });
+  render();
+  announce(help);
+})();
 </script>
 </body>
 </html>
