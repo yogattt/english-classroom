@@ -86,6 +86,26 @@
         "写作迁移"
       ],
       "href": "papers/passive-voice-workshop/index.html"
+    },
+    {
+      "id": "reaching-for-the-stars",
+      "title": "Reaching for the Stars · 追逐星辰",
+      "subject": "英语",
+      "grade": "九年级",
+      "term": "九年级上册 · Unit 6 Section B",
+      "addedOn": "2026-11-23",
+      "description": "从旅行者 1 号到比邻星，结合四段分步动画精读课文，分析科普文章如何用事实和数据说明问题。",
+      "scope": "教材第 147–148 页 · 读前活动 1a / 1b · 四段课文 · 3 道课堂检测与 1 项写作任务",
+      "unitCount": 4,
+      "exerciseCount": 3,
+      "hasWriting": true,
+      "tags": [
+        "科普阅读",
+        "文本类型",
+        "长难句",
+        "写作迁移"
+      ],
+      "href": "papers/reaching-for-the-stars/index.html"
     }
   ]
 }

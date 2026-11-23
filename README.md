@@ -4,6 +4,8 @@
 
 当前课件：
 
+- [Reaching for the Stars · 追逐星辰](https://yogattt.github.io/english-classroom/papers/reaching-for-the-stars/)
+
 - [被动语态精讲与专项训练](https://yogattt.github.io/english-classroom/papers/passive-voice-workshop/)
 
 - [美，是一种抵抗 ·《短文两篇》联读](https://yogattt.github.io/english-classroom/papers/meishi-dikang/)
