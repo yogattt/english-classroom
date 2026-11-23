@@ -118,6 +118,19 @@
   .guide-page dt { margin-top: 6px; font-weight: 700; color: var(--teal); }
   .guide-page dd { margin: 1px 0 0; }
   .guide-page blockquote { margin: 10px 0; padding: 8px 10px; border-left: 2px solid #b7c7ce; background: #f1f3ef; font: .99em/1.42 var(--serif); }
+  .language-extension { margin: 12px 0 0; border: 1px solid #cadbd5; border-radius: 8px; background: #f2f6f1; }
+  .language-extension > summary { padding: 8px 11px; color: var(--teal); font-weight: 700; cursor: pointer; }
+  .language-extension > summary span { margin-left: 4px; color: var(--muted); font-size: .8em; font-weight: 500; }
+  .language-extension[open] > summary { border-bottom: 1px solid #cadbd5; }
+  .language-body { padding: 3px 11px 11px; }
+  .guide-page .language-points { margin: 0; }
+  .language-point { padding: 8px 0; }
+  .language-point + .language-point { border-top: 1px solid #dbe5db; }
+  .language-point dt { margin: 0 0 3px; }
+  .language-example { display: block; margin-top: 4px; color: var(--blue); font: 1.04em/1.4 var(--serif); }
+  .language-practice { margin-top: 4px; padding: 9px 10px; border: 1px solid #decfaf; border-radius: 6px; background: #fbf7ec; }
+  .language-practice .practice-label { display: block; margin-bottom: 2px; color: #795621; font-size: .81em; }
+  .language-practice .answer { margin-top: 7px; }
   .guide-bottom { margin-top: 12px; }
   .answer { margin: 10px 0 0; padding: 10px 12px; border-left: 3px solid #619388; border-radius: 0 6px 6px 0; background: #e8f0ea; color: #1b4b41; }
   .explain { margin-block: 18px 28px; padding: 20px clamp(16px, 3vw, 27px); }
@@ -176,7 +189,7 @@
     .wrap { width: 100%; }
     .cover-copy { padding: 0 0 8pt; }
     .cover h1 { font-size: 25pt; color: black; }
-    .masthead, .cover-art, .lesson-bar, .reading-tools, .guide-menu, .guide-bottom, .illustration-dialog, .choices input, .illustration-open span { display: none; }
+    .masthead, .cover-art, .lesson-bar, .reading-tools, .guide-menu, .guide-bottom, #guide-count, .illustration-dialog, .choices input, .illustration-open span { display: none; }
     .section { margin-block: 12pt; }
     .card, .guide { border: 0; box-shadow: none; padding: 0; }
     .section-head { margin-bottom: 6pt; }
@@ -191,9 +204,16 @@
     .guide-illustration img { width: min(90mm, 100%); }
     .illustration-open { width: auto; background: none; }
     .translation, .tip, .answer { color: black; background: white; }
-    .quiz, .scale, .guide-page { break-inside: avoid; }
+    .quiz, .scale, .language-point, .language-practice { break-inside: avoid; }
+    .language-extension { background: white; }
+    .language-extension > summary, .language-point dt { break-after: avoid; }
+    .language-extension > summary { color: black; }
     .quiz + .quiz { margin-top: 9pt; }
+    .quiz .choices { gap: 1pt; }
+    .quiz .choices label { padding-block: 1pt; }
+    .quiz .answer { margin-top: 4pt; padding-block: 3pt; }
     .quiz label[data-correct] { font-weight: bold; }
+    #write { break-inside: avoid; }
     .paragraph-button, .paragraph-button[aria-pressed="true"], .paragraph-button[aria-pressed="true"] .number { background: none; color: black; }
     .marker { background: white; color: black; border-color: #66717c; }
     .paragraph.is-active .emphasis { background: transparent; box-shadow: none; }
@@ -320,6 +340,33 @@
           </dl>
           <p class="question" lang="en">What question does the writer raise?</p>
           <div class="answer" hidden lang="en">Can we visit the stars one day?</div>
+          <details class="language-extension">
+            <summary>语言点拓展 <span>3 个用法 · 随练</span></summary>
+            <div class="language-body">
+              <dl class="language-points">
+                <div class="language-point">
+                  <dt lang="en">since the beginning of … / for thousands of years</dt>
+                  <dd><b lang="en">since</b> 接起点，<b lang="en">for</b> 接一段时长。原文用现在完成时 <span lang="en">have looked up</span>，把从过去开始的行为和现在连起来。<span class="language-example" lang="en">We have observed the stars since 2021. / We have observed the stars for several years.</span></dd>
+                </div>
+                <div class="language-point">
+                  <dt lang="en">look up at the stars / look up a word</dt>
+                  <dd><span lang="en">look up at</span> 表示抬头看某物，<span lang="en">look up</span> 也可以表示查找资料。后一种用法的宾语是代词时，放在 <span lang="en">look</span> 和 <span lang="en">up</span> 之间。<span class="language-example" lang="en">Look up at the sky. If you don’t know the word, look it up.</span></dd>
+                </div>
+                <div class="language-point">
+                  <dt lang="en">as technology and science developed</dt>
+                  <dd>这里的 <b lang="en">as</b> 表示“随着”。前半句交代一种变化，后半句写与之相伴的另一种变化。可用这一结构写科学进步带来的影响。<span class="language-example" lang="en">As telescopes improved, people were able to see more distant objects.</span></dd>
+                </div>
+              </dl>
+              <div class="language-practice">
+                <strong class="practice-label">随堂语言练习</strong>
+                <p>改写 · 保留 2021 年这个起点，用 <span lang="en">since</span> 把两句合成一句。</p>
+                <p class="question" lang="en">The club began observing the stars in 2021. It still observes them.</p>
+                <div class="answer" hidden>
+                  <strong>参考写法</strong> <span lang="en">The club has been observing the stars since 2021.</span><br>用现在完成进行时突出从 2021 年延续到现在的观测活动。也可用 <span lang="en">has observed</span>。
+                </div>
+              </div>
+            </div>
+          </details>
         </section>
         <section class="guide-page" id="guide-2" hidden>
           <h4>用例子和数字说明距离</h4>
@@ -339,6 +386,37 @@
           </dl>
           <p class="question" lang="en">Why does Voyager 1 carry a special record?</p>
           <div class="answer" hidden lang="en">In case alien life finds Voyager 1, the record can show who we are and where we are from.</div>
+          <details class="language-extension">
+            <summary>语言点拓展 <span>4 个用法 · 随练</span></summary>
+            <div class="language-body">
+              <dl class="language-points">
+                <div class="language-point">
+                  <dt lang="en">the object which has travelled farthest from Earth</dt>
+                  <dd>原句主干是 <span lang="en">The man-made object is Voyager 1.</span> <b lang="en">which</b> 指代 <span lang="en">the man-made object</span>，在定语从句里作主语。<b lang="en">farthest</b> 修饰 <span lang="en">has travelled</span>，对应第 1 段的比较级 <span lang="en">farther away</span>。<span class="language-example" lang="en">The probe that sent this picture is still in space.</span></dd>
+                </div>
+                <div class="language-point">
+                  <dt lang="en">in case … / if …</dt>
+                  <dd><span lang="en">in case</span> 说明提前准备的理由，<span lang="en">if</span> 说明行动发生的条件。联系原文，唱片在出发时就已带上，为可能的发现提前作准备。<span class="language-example" lang="en">Take an umbrella in case it rains. If it rains, open the umbrella.</span></dd>
+                </div>
+                <div class="language-point">
+                  <dt lang="en">It shows who we are and where we are from.</dt>
+                  <dd><b lang="en">It</b> 指金唱片。两个并列的宾语从句都用陈述语序。把直接问句嵌进另一句话时，保留疑问词，再按“主语＋谓语”的顺序组织。<span class="language-example" lang="en">Where are we from? → The record shows where we are from.</span></dd>
+                </div>
+                <div class="language-point">
+                  <dt lang="en">by 2025 / 4.2 light years away</dt>
+                  <dd>用 <b lang="en">by</b> 给数据划出时间界限，此处是“到 2025 年为止”。用 <b lang="en">away</b> 表达“相距多远”。如果需要明确从哪里量起，可以用 <span lang="en">… kilometres from Earth</span>。<span class="language-example" lang="en">The village is 20 kilometres away. It is 20 kilometres from the city centre.</span></dd>
+                </div>
+              </dl>
+              <div class="language-practice">
+                <strong class="practice-label">随堂语言练习</strong>
+                <p>合句 · 把第二句变成修饰 <span lang="en">messages</span> 的定语从句。</p>
+                <p class="question" lang="en">The record carries messages. They tell people about Earth.</p>
+                <div class="answer" hidden>
+                  <strong>参考写法</strong> <span lang="en">The record carries messages that tell people about Earth.</span><br><span lang="en">that</span> 或 <span lang="en">which</span> 都可在这里代替 <span lang="en">they</span>。先行词 <span lang="en">messages</span> 是复数，从句谓语用 <span lang="en">tell</span>。
+                </div>
+              </div>
+            </div>
+          </details>
         </section>
         <section class="guide-page" id="guide-3" hidden>
           <h4>从距离读到生存难题</h4>
@@ -358,6 +436,32 @@
           </dl>
           <p class="question" lang="en">Besides time, what problems does the writer mention?</p>
           <div class="answer" hidden lang="en">Food and drink, and the astronauts’ health and safety.</div>
+          <details class="language-extension">
+            <summary>语言点拓展 <span>3 个用法 · 随练</span></summary>
+            <div class="language-body">
+              <dl class="language-points">
+                <div class="language-point">
+                  <dt lang="en">the challenge of visiting the stars</dt>
+                  <dd><b lang="en">of</b> 后可接动词的 <span lang="en">-ing</span> 形式，说明挑战具体是什么。同一结构也能说明某件事的可能性，如 <span lang="en">the possibility of living on Mars</span>。<span class="language-example" lang="en">One challenge of living in space is storing enough water.</span></dd>
+                </div>
+                <div class="language-point">
+                  <dt lang="en">only about 400,000 / even a journey to Mars / around six to nine months</dt>
+                  <dd>读数字时也看数字旁边的词。<b lang="en">only</b> 强调距离相对有限，<b lang="en">even</b> 突出连去火星都耗时很长，<b lang="en">about</b> 和 <b lang="en">around</b> 表示估算。<span class="language-example" lang="en">Even a short flight can take around an hour.</span></dd>
+                </div>
+                <div class="language-point">
+                  <dt lang="en">It might take … to get there.</dt>
+                  <dd>用 <b lang="en">It takes + 时间 + to do</b> 表达做某事要花多久。加 <span lang="en">might</span> 表示可能耗时，后接动词原形 <span lang="en">take</span>。原文的 <span lang="en">there</span> 指另一颗恒星。<span class="language-example" lang="en">It might take a long time to receive a reply.</span></dd>
+                </div>
+              </dl>
+              <div class="language-practice">
+                <strong class="practice-label">随堂语言练习</strong>
+                <p>仿写 · 用 <span lang="en">It takes … to …</span> 把课文里去火星的耗时说一遍，保留“大约”。</p>
+                <div class="answer" hidden>
+                  <strong>参考写法</strong> <span lang="en">At present, it takes around six to nine months to travel to Mars.</span><br><span lang="en">around</span> 保留估算语气。<span lang="en">to travel to Mars</span> 说明时间花在哪件事上。
+                </div>
+              </div>
+            </div>
+          </details>
         </section>
         <section class="guide-page" id="guide-4" hidden>
           <h4>从现实困难过渡到未来设想</h4>
@@ -377,6 +481,36 @@
           </dl>
           <p class="question" lang="en">What two ideas do scientists have?</p>
           <div class="answer" hidden lang="en">Have astronauts sleep during the journey and develop much faster spacecraft.</div>
+          <details class="language-extension">
+            <summary>语言点拓展 <span>4 个用法 · 随练</span></summary>
+            <div class="language-body">
+              <dl class="language-points">
+                <div class="language-point">
+                  <dt lang="en">like some animals do in winter</dt>
+                  <dd>这里的 <b lang="en">do</b> 代替前面已提到的动作 <span lang="en">sleep</span>。从上下文找回被省掉的动作，才能看出作者在把宇航员休眠和什么现象作类比。<span class="language-example" lang="en">Mia works carefully, just like her classmates do.</span></dd>
+                </div>
+                <div class="language-point">
+                  <dt lang="en">One idea is to … Another is to …</dt>
+                  <dd><b lang="en">Another</b> 指 <span lang="en">another idea</span>。用两个平行的 <span lang="en">to + 动词原形</span> 提出设想，读者容易分清两种方案。<span class="language-example" lang="en">One idea is to store more water. Another is to recycle the water we use.</span></dd>
+                </div>
+                <div class="language-point">
+                  <dt lang="en">have photographed …, set foot on …, and landed …</dt>
+                  <dd>三个过去分词共用一个 <b lang="en">have</b>，把多项已有成就并列起来。<span lang="en">set</span> 的原形和过去分词拼写相同。<span lang="en">set foot on</span> 表示“踏上”。<span lang="en">land rovers on Mars</span> 表示“让探测车在火星着陆”。<span class="language-example" lang="en">The team has designed, built, and tested a small rover.</span></dd>
+                </div>
+                <div class="language-point">
+                  <dt lang="en">there is hope that … / It seems likely that …</dt>
+                  <dd>两种表达都能控制科普写作的语气。<span lang="en">there is hope that …</span> 表示有实现的希望。<span lang="en">It seems likely that …</span> 表示根据目前所知，某种结果有可能出现。<span class="language-example" lang="en">It seems likely that the next test will take longer.</span></dd>
+                </div>
+              </dl>
+              <div class="language-practice">
+                <strong class="practice-label">随堂语言练习</strong>
+                <p>迁移 · 换一个话题，用 <span lang="en">One idea is to … Another is to …</span> 提出两条校园节水建议。</p>
+                <div class="answer" hidden>
+                  <strong>参考写法</strong> <span lang="en">One idea is to fix leaking taps. Another is to collect rainwater for the school garden.</span><br>两条建议分别用 <span lang="en">to fix</span> 和 <span lang="en">to collect</span> 起头，保持平行结构。
+                </div>
+              </div>
+            </div>
+          </details>
         </section>
         <div class="guide-bottom">
           <a class="jump" id="jump-to-text" href="#paragraph-1">查看本段原文 ↑</a>
@@ -556,14 +690,15 @@
   window.addEventListener('hashchange', updateNavigation);
   updateNavigation();
 
-  let warmupWasOpen;
+  const printableDisclosures = [warmup, ...document.querySelectorAll('.language-extension')];
+  let disclosureStates;
   window.addEventListener('beforeprint', () => {
-    warmupWasOpen ??= warmup.open;
-    warmup.open = true;
+    disclosureStates ??= printableDisclosures.map(disclosure => disclosure.open);
+    printableDisclosures.forEach(disclosure => { disclosure.open = true; });
   });
   window.addEventListener('afterprint', () => {
-    if (warmupWasOpen !== undefined) warmup.open = warmupWasOpen;
-    warmupWasOpen = undefined;
+    disclosureStates?.forEach((open, index) => { printableDisclosures[index].open = open; });
+    disclosureStates = undefined;
   });
   document.querySelector('#print').addEventListener('click', () => window.print());
 </script>
