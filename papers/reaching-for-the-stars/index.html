@@ -104,6 +104,23 @@
   .section-head { display: flex; justify-content: space-between; align-items: end; gap: 12px 20px; flex-wrap: wrap; margin-bottom: 12px; }
   .section-head .kicker { margin-bottom: 4px; }
   .reading-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; }
+  .vocab-tip { margin: 5px 0 0; color: var(--muted); font-size: .8rem; }
+  .vocab-word { white-space: nowrap; text-decoration: underline dotted #306c62 1.5px; text-underline-offset: .18em; cursor: pointer; user-select: text; }
+  .vocab-word:hover, .vocab-word[aria-expanded="true"] { background: #dcebe3; border-radius: 2px; }
+  .vocab-card { position: fixed; z-index: 4; display: flex; flex-direction: column; overflow: hidden; width: min(390px, calc(100% - 20px)); max-height: min(420px, 72dvh); border: 1px solid #9ab7aa; border-radius: 13px; background: var(--card); color: var(--ink); box-shadow: 0 12px 34px #142f3d3a; }
+  .vocab-card-head { display: flex; align-items: start; justify-content: space-between; flex: 0 0 auto; gap: 10px; padding: 12px 14px 10px; border-bottom: 1px solid #cadbd2; background: #edf4ef; }
+  .vocab-card-head h3 { margin: 0; color: var(--navy); font: 700 1.36rem/1.12 var(--serif); }
+  .vocab-card-head p { margin: 4px 0 0; color: var(--teal); font-size: .77rem; font-weight: 650; }
+  .vocab-card-head .btn { min-height: 31px; white-space: nowrap; }
+  .vocab-card-actions { flex: 0 0 auto; display: flex; gap: 5px; }
+  .vocab-card-body { overflow: auto; min-height: 0; padding: 11px 14px 12px; font-size: .91rem; line-height: 1.48; }
+  .vocab-sense { margin: 0 0 7px; font-weight: 650; }
+  .vocab-card dl { display: grid; grid-template-columns: max-content 1fr; gap: 5px 8px; margin: 0; }
+  .vocab-card dt { color: var(--teal); font-weight: 700; }
+  .vocab-card dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
+  .vocab-example { margin: 10px 0 0; padding: 7px 9px; border-left: 2px solid #8eb4a5; background: #f0f4ef; }
+  .vocab-example p { margin: 0; font: 1.08em/1.38 var(--serif); }
+  .vocab-example span { display: block; margin-top: 3px; color: var(--muted); font-size: .89em; }
   .slider { display: inline-flex; align-items: center; color: var(--muted); gap: 6px; font-size: .82rem; white-space: nowrap; }
   .slider input { width: clamp(58px, 7vw, 102px); accent-color: var(--blue); margin: 0; }
   .slider output { min-width: 34px; font-variant-numeric: tabular-nums; }
@@ -208,6 +225,9 @@
     .warmup summary span { display: block; margin: 2px 0 0 14px; }
     .distance-list { grid-template-columns: 1fr; gap: 6px; }
   }
+  @media (max-width: 380px) {
+    .vocab-word { white-space: normal; }
+  }
   @media print {
     @page { size: A4; margin: 15mm; }
     :root { --passage-size: 12pt; --guide-size: 11pt; }
@@ -220,6 +240,8 @@
     .masthead, .cover-art, .lesson-bar, .reading-tools, .guide-menu, .guide-bottom, #guide-count, .illustration-dialog, .choices input, .illustration-open span { display: none; }
     .annotation-ink, .annotation-notes, .annotation-dialog { display: none !important; }
     .annotation-mark, .annotation-mark.has-note { background: transparent; box-shadow: none; }
+    .vocab-tip, .vocab-card { display: none !important; }
+    .vocab-word { white-space: normal; text-decoration: none; }
     .section { margin-block: 12pt; }
     .card, .guide { border: 0; box-shadow: none; padding: 0; }
     .section-head { margin-bottom: 6pt; }
@@ -325,6 +347,7 @@
       <div>
         <div class="kicker" lang="en">READING</div>
         <h2>语篇精读</h2>
+        <p class="vocab-tip">点击原文中带点线的词语，查看用法和例句。</p>
       </div>
       <div class="reading-tools">
         <label class="slider">原文字号 <input type="range" id="passage-size" min="18" max="36" value="24"> <output for="passage-size">24px</output></label>
@@ -336,22 +359,22 @@
       <article class="card passage" aria-label="英文原文">
         <section class="paragraph is-active" id="paragraph-1">
           <button class="paragraph-button" type="button" data-paragraph="1" aria-controls="guide-1" aria-pressed="true"><span class="number">1</span> 人类对星辰的好奇</button>
-          <p class="reading-text" lang="en">Since the beginning of human history, people have looked up at the stars and wondered what they were like. Many ancient cultures believed that these points of light were from gods or other mysterious worlds. However, as technology and science developed, we learnt the truth about stars. They are real places like our own sun, and they are farther away than anyone imagined. <span class="emphasis">This raises the question: Can we visit the stars one day?</span></p>
+          <p class="reading-text" lang="en">Since the beginning of human history, people have <span class="vocab-word" id="vocab-p1-look-up-at" data-vocab="look-up-at" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">looked up at</span> the stars and <span class="vocab-word" id="vocab-p1-wonder" data-vocab="wonder" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">wondered</span> what they were like. Many ancient cultures believed that these points of light were from gods or other <span class="vocab-word" id="vocab-p1-mysterious" data-vocab="mysterious" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">mysterious</span> worlds. However, as technology and science <span class="vocab-word" id="vocab-p1-develop" data-vocab="develop" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">developed</span>, we learnt the truth about stars. They are real places like our own sun, and they are farther away than anyone imagined. <span class="emphasis">This <span class="vocab-word" id="vocab-p1-raise-the-question" data-vocab="raise-the-question" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">raises the question</span>: Can we visit the stars one day?</span></p>
           <p class="translation" hidden>自人类历史之初，人们就仰望星空，想知道星辰是什么样的。许多古代文明相信，这些光点来自神明或其他神秘世界。然而，随着科技的发展，我们逐渐了解了星辰的真相。它们像我们的太阳一样真实存在，也比任何人想象得更遥远。这就引出了一个问题：有朝一日，我们能造访星辰吗？</p>
         </section>
         <section class="paragraph" id="paragraph-2">
           <button class="paragraph-button" type="button" data-paragraph="2" aria-controls="guide-2" aria-pressed="false"><span class="number">2</span> 旅行者 1 号飞了多远？</button>
-          <p class="reading-text" lang="en">The man-made object which has travelled farthest from Earth is Voyager 1. This spacecraft was launched in 1977. In case Voyager 1 is found by alien life, a special record with sounds and pictures from Earth is carried on board. It shows who we are and where we are from. <span class="emphasis">By 2025, Voyager 1 was over 25 billion kilometres from Earth, but that is still a long way from Earth’s second-closest star, Proxima Centauri.</span> That star is 4.2 light years away—about 40 trillion kilometres!</p>
+          <p class="reading-text" lang="en">The <span class="vocab-word" id="vocab-p2-man-made" data-vocab="man-made" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">man-made</span> object which has travelled farthest from Earth is Voyager 1. This <span class="vocab-word" id="vocab-p2-spacecraft" data-vocab="spacecraft" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">spacecraft</span> was <span class="vocab-word" id="vocab-p2-launch" data-vocab="launch" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">launched</span> in 1977. <span class="vocab-word" id="vocab-p2-in-case" data-vocab="in-case" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">In case</span> Voyager 1 is found by alien life, a special record with sounds and pictures from Earth is carried <span class="vocab-word" id="vocab-p2-on-board" data-vocab="on-board" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">on board</span>. It shows who we are and where we are from. <span class="emphasis">By 2025, Voyager 1 was over 25 billion kilometres from Earth, but that is still a long way from Earth’s second-closest star, Proxima Centauri.</span> That star is 4.2 <span class="vocab-word" id="vocab-p2-light-year" data-vocab="light-year" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">light years</span> away—about 40 trillion kilometres!</p>
           <p class="translation" hidden>飞得离地球最远的人造物体是旅行者 1 号。它于 1977 年发射。万一它被外星生命发现，飞船上带有一张特别的唱片，收录了来自地球的声音和图像，展示我们是谁、来自哪里。到 2025 年，旅行者 1 号已飞到离地球超过 250 亿千米的地方，但这一距离与地球第二近的恒星比邻星相比，仍相差很远。那颗恒星离我们有 4.2 光年，约 40 万亿千米！</p>
         </section>
         <section class="paragraph" id="paragraph-3">
           <button class="paragraph-button" type="button" data-paragraph="3" aria-controls="guide-3" aria-pressed="false"><span class="number">3</span> 载人飞行有多难？</button>
-          <p class="reading-text" lang="en">The challenge of visiting the stars gets even bigger for space flights with humans. The farthest that any human has travelled in space is only about 400,000 kilometres, to the far side of the moon. Time is a big problem. At present, even a journey to the planet Mars will take around six to nine months. <span class="emphasis">What will the astronauts eat and drink during this period? And how about their health and safety?</span> These problems grow when we talk about visiting another star. It might take hundreds of thousands of years to get there!</p>
+          <p class="reading-text" lang="en">The <span class="vocab-word" id="vocab-p3-challenge" data-vocab="challenge" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">challenge</span> of visiting the stars gets even bigger for space flights with humans. The farthest that any human has travelled in space is only about 400,000 kilometres, to the <span class="vocab-word" id="vocab-p3-far-side" data-vocab="far-side" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">far side</span> of the moon. Time is a big problem. <span class="vocab-word" id="vocab-p3-at-present" data-vocab="at-present" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">At present</span>, even a <span class="vocab-word" id="vocab-p3-journey" data-vocab="journey" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">journey</span> to the planet Mars will take around six to nine months. <span class="emphasis">What will the astronauts eat and drink during this period? And how about their health and <span class="vocab-word" id="vocab-p3-safety" data-vocab="safety" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">safety</span>?</span> These problems grow when we talk about visiting another star. It might take hundreds of thousands of years to get there!</p>
           <p class="translation" hidden>对载人太空飞行而言，造访星辰的挑战更大。人类在太空中到过的最远处是月球背面，距离只有大约 40 万千米。时间是一大难题。以目前的条件，即使前往火星也需要约六到九个月。这段时间里，宇航员吃什么、喝什么？健康和安全又如何保障？说到造访另一颗恒星，这些问题就更严峻了。到那里可能要几十万年！</p>
         </section>
         <section class="paragraph" id="paragraph-4">
           <button class="paragraph-button" type="button" data-paragraph="4" aria-controls="guide-4" aria-pressed="false"><span class="number">4</span> 未来有哪些可能？</button>
-          <p class="reading-text" lang="en">Scientists, however, believe that visiting the stars is not a completely wild dream. One idea is to have the astronauts sleep during their journey, like some animals do in winter. Another is to develop much faster spacecraft. <span class="emphasis">While this is not possible right now, with nations and scientists cooperating with one another, there is hope that the necessary technology will be developed.</span> Humans have photographed other galaxies, set foot on the moon, and even successfully landed rovers on Mars. It seems likely that one day we will reach the stars.</p>
+          <p class="reading-text" lang="en">Scientists, however, believe that visiting the stars is not a completely <span class="vocab-word" id="vocab-p4-wild-dream" data-vocab="wild-dream" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">wild dream</span>. One idea is to have the astronauts sleep during their journey, like some animals do in winter. Another is to <span class="vocab-word" id="vocab-p4-develop" data-vocab="develop" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">develop</span> much faster spacecraft. <span class="emphasis">While this is not possible right now, with nations and scientists <span class="vocab-word" id="vocab-p4-cooperate" data-vocab="cooperate" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">cooperating with</span> one another, there is hope that the necessary technology will be developed.</span> Humans have photographed other galaxies, <span class="vocab-word" id="vocab-p4-set-foot-on" data-vocab="set-foot-on" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">set foot on</span> the moon, and even successfully <span class="vocab-word" id="vocab-p4-land" data-vocab="land" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">landed</span> rovers on Mars. It seems <span class="vocab-word" id="vocab-p4-likely" data-vocab="likely" role="button" tabindex="0" aria-controls="vocab-card" aria-haspopup="dialog" aria-expanded="false">likely</span> that one day we will reach the stars.</p>
           <p class="translation" hidden>然而，科学家认为，造访星辰并非全然不切实际的梦想。一个设想是让宇航员在旅途中像有些动物过冬那样进入休眠。另一个设想是研制速度更快的航天器。虽然目前还做不到，但随着各国和科学家携手合作，人们有望研发出所需的技术。人类已经拍摄过其他星系、踏上过月球，甚至成功让探测车在火星着陆。看来有朝一日，我们很可能抵达星辰。</p>
         </section>
       </article>
@@ -648,6 +671,23 @@
     <figcaption></figcaption>
   </figure>
 </dialog>
+<section class="vocab-card" id="vocab-card" role="dialog" aria-modal="false" aria-labelledby="vocab-title" hidden>
+  <header class="vocab-card-head">
+    <div><h3 id="vocab-title" lang="en" tabindex="-1"></h3><p id="vocab-form"></p></div>
+    <div class="vocab-card-actions">
+      <button type="button" class="btn" id="vocab-select">选词批注</button>
+      <button type="button" class="btn" id="vocab-close" aria-label="关闭词汇讲解">关闭</button>
+    </div>
+  </header>
+  <div class="vocab-card-body">
+    <p class="vocab-sense" id="vocab-sense"></p>
+    <dl>
+      <dt>常用搭配</dt><dd id="vocab-pattern"></dd>
+      <dt>用法提示</dt><dd id="vocab-usage"></dd>
+    </dl>
+    <blockquote class="vocab-example"><p id="vocab-example" lang="en"></p><span id="vocab-example-cn"></span></blockquote>
+  </div>
+</section>
 <dialog class="annotation-dialog" aria-labelledby="annotation-dialog-title">
   <form id="annotation-form">
     <h2 id="annotation-dialog-title">文字批注</h2>
@@ -902,24 +942,29 @@
     return index >= 0 && index === anchor.text.lastIndexOf(item.quote) ? [index, index + item.quote.length] : null;
   }
 
+  function annotationChip(record, label, value) {
+    const chip = document.createElement('button');
+    const sample = value.trim().replace(/\s+/g, ' ');
+    chip.type = 'button';
+    chip.className = 'btn';
+    chip.dataset.annotationId = record.id;
+    chip.textContent = label + ' · ' + sample.slice(0, 18) + (sample.length > 18 ? '…' : '');
+    return chip;
+  }
+
   function renderText() {
     const fragmentByParagraph = new Map([...noteLists.keys()].map(id => [id, document.createDocumentFragment()]));
     for (const [key, anchor] of anchors) {
       const target = anchor.target;
       target.replaceChildren(...anchor.original.map(node => node.cloneNode(true)));
       const entries = [];
+      const chips = fragmentByParagraph.get(anchor.paragraph);
       if (shown) {
         items.filter(item => item.anchor === key).forEach(item => {
           const offsets = rangeOffsets(item, anchor);
           if (offsets) entries.push({ item, start: offsets[0], end: offsets[1] });
           if (item.kind === 'note') {
-            const chip = document.createElement('button');
-            const sample = item.note.trim().replace(/\s+/g, ' ');
-            chip.type = 'button';
-            chip.className = 'btn';
-            chip.dataset.annotationId = item.id;
-            chip.textContent = '批注 · ' + sample.slice(0, 18) + (sample.length > 18 ? '…' : '');
-            fragmentByParagraph.get(anchor.paragraph).append(chip);
+            chips.append(annotationChip(item, '批注', item.note));
           }
         });
       }
@@ -935,6 +980,7 @@
         const to = offset += node.length;
         const intersecting = entries.filter(entry => entry.start < to && entry.end > from);
         if (!intersecting.length) continue;
+        const insideVocabulary = Boolean(node.parentElement.closest('.vocab-word'));
         const cuts = new Set([from, to]);
         intersecting.forEach(entry => {
           cuts.add(Math.max(entry.start, from));
@@ -956,7 +1002,7 @@
           mark.className = 'annotation-mark' + (record.kind === 'note' ? ' has-note' : '');
           mark.dataset.annotationId = record.id;
           mark.textContent = text;
-          if (record.kind === 'highlight' && !focusable.has(record.id)) {
+          if (record.kind === 'highlight' && !insideVocabulary && !focusable.has(record.id)) {
             mark.tabIndex = 0;
             mark.setAttribute('role', 'button');
             mark.setAttribute('aria-label', '查看高亮 · ' + record.quote);
@@ -966,6 +1012,11 @@
         }
         node.replaceWith(fragment);
       }
+      entries.forEach(({ item }) => {
+        if (item.kind === 'highlight' && !focusable.has(item.id)) {
+          chips.append(annotationChip(item, '高亮', item.quote));
+        }
+      });
     }
     for (const [paragraph, list] of noteLists) {
       list.replaceChildren(fragmentByParagraph.get(paragraph));
@@ -1300,6 +1351,333 @@
   });
   render();
   announce(help);
+})();
+</script>
+<script id="vocab-data" type="application/json">
+{
+  "look-up-at": [
+    "look up at",
+    "动词短语 · 原文 looked up at",
+    "抬头看，仰望。原文写人们仰头看星星。",
+    "look up at the sky 仰望天空 · look up from a book 从书本上抬起头",
+    "后面有仰望的对象时，用 at 引出。look up 也能表示“查找”，例如 look up a word，代词要放在中间，写作 look it up。",
+    "I looked up from my book and saw the moon.",
+    "我从书本上抬起头，看见了月亮。"
+  ],
+  "wonder": [
+    "wonder",
+    "动词 · 原文 wondered",
+    "想知道，感到好奇。文中人们想知道星星是什么样的。",
+    "wonder what / why / how … 想知道什么、为什么或怎么办 · wonder if / whether … 想知道是否……",
+    "后面接疑问词引导的宾语从句时，用陈述语序。I wonder … 也常用于委婉提问，例如 I wonder if you could help me.",
+    "I wonder how scientists measure the distance to a star.",
+    "我想知道科学家怎样测量到一颗恒星的距离。"
+  ],
+  "mysterious": [
+    "mysterious",
+    "形容词 · 名词 mystery",
+    "神秘的，让人难以理解或解释的。文中修饰 worlds。",
+    "a mysterious signal 神秘的信号 · a mysterious sound 神秘的声音 · solve a mystery 解开谜团",
+    "mysterious 描述事物的特征。mystery 是名词，常指一个待解之谜。用形容词描述信号，用名词指信号背后的谜团。",
+    "A mysterious signal woke the crew. Its source is still a mystery.",
+    "一个神秘的信号吵醒了机组人员。信号的来源仍是谜。"
+  ],
+  "develop": [
+    "develop",
+    "动词 · 可及物，也可不及物",
+    "第 1 段 science developed 表示科学逐步发展。第 4 段 develop faster spacecraft 表示研发速度更快的航天器。",
+    "develop a tool 开发工具 · develop a habit 养成习惯 · rapid development 快速发展",
+    "主语是逐渐变化的事物时，develop 可以单独用。表示主动研发或培养时，常直接带宾语。",
+    "As technology develops, engineers can develop better tools.",
+    "随着技术发展，工程师可以开发更好的工具。"
+  ],
+  "raise-the-question": [
+    "raise a question",
+    "动词搭配 · 原文 raises the question",
+    "提出或引出一个问题。原文借前面的内容自然引出全文要探究的问题。",
+    "raise a question 提出问题 · raise doubts 引起疑虑 · raise your hand 举手",
+    "raise 常带宾语，表示“举起、提高或提出”。rise 常表示事物自己上升，如 The sun rises. 文中用 the question 指紧接着明确提出的那个问题。",
+    "The new result raises a question about how the machine works.",
+    "这个新结果引出了一个关于机器如何运转的问题。"
+  ],
+  "man-made": [
+    "man-made",
+    "形容词 · 通常放在名词前",
+    "人造的。man-made object 指人类制造的物体。",
+    "a man-made lake 人工湖 · a man-made island 人工岛 · a natural lake 天然湖泊",
+    "常用于区分人工建造与自然形成。artificial 也表示人工的，常见于 artificial light（人造光）等词组。",
+    "Many birds gather near the man-made lake.",
+    "许多鸟聚集在那座人工湖附近。"
+  ],
+  "spacecraft": [
+    "spacecraft",
+    "可数名词 · 单复数同形",
+    "航天器。可以指载人航天器，也可以指旅行者 1 号这样的无人探测器。",
+    "launch a spacecraft 发射航天器 · a crewed spacecraft 载人航天器 · an uncrewed spacecraft 无人航天器",
+    "说一艘用 a spacecraft，说两艘用 two spacecraft。probe 往往强调探测任务，spacecraft 是更广的类别。",
+    "Two spacecraft can carry different instruments on the same mission.",
+    "执行同一任务的两艘航天器可以携带不同仪器。"
+  ],
+  "launch": [
+    "launch",
+    "动词、名词 · 原文 was launched",
+    "发射。原文的 was launched in 1977 用被动语态说明航天器的发射年份。",
+    "launch a rocket 发射火箭 · launch a project 启动项目 · a rocket launch 一次火箭发射",
+    "作动词时，既能指把火箭或航天器送上太空，也能指正式启动项目。作名词时可以表示一次发射。",
+    "The team plans to launch a small satellite next year.",
+    "这个团队计划明年发射一颗小型卫星。"
+  ],
+  "in-case": [
+    "in case",
+    "连词短语 · 后接从句",
+    "以防万一。唱片随探测器出发，是为可能发生的事提前做准备。",
+    "in case it rains 以防下雨 · just in case 以防万一 · in case of fire 如遇火情",
+    "in case 后接句子，in case of 后接名词。比较 Take a torch in case it gets dark. 和 If it gets dark, use the torch. 两句分别写提前准备和条件满足后的行动。",
+    "I saved an offline copy in case the internet stopped working.",
+    "我保存了一份离线副本，以防网络中断。"
+  ],
+  "on-board": [
+    "on board",
+    "固定短语 · on board / onboard",
+    "在船上、飞机上或航天器上。carried on board 指随航天器携带。",
+    "carry equipment on board 随船携带设备 · on board the plane 在飞机上 · onboard equipment 机载或船载设备",
+    "on board 后可接交通工具，也能像原文那样单独使用。onboard 写成一个词可作形容词，放在名词前。",
+    "There were cameras on board the spacecraft.",
+    "这艘航天器上装有相机。"
+  ],
+  "light-year": [
+    "light year",
+    "可数名词 · 原文 4.2 light years",
+    "光年。表示光在一年内走过的距离，用来量很远的天体距离。",
+    "one light year 一光年 · several light years away 相距数光年 · be … light years from Earth 距地球……光年",
+    "数量大于一时用复数 light years。描述距离可用 A is … away 或 A is … from B。",
+    "The star is several light years away from Earth.",
+    "这颗恒星离地球有数光年。"
+  ],
+  "challenge": [
+    "challenge",
+    "可数名词、动词 · 原文作名词",
+    "挑战、难题。文中指造访星辰，尤其是载人飞行要克服的难题。",
+    "face a challenge 面临挑战 · take on a challenge 接受挑战 · the challenge of doing sth. 做某事的挑战",
+    "the challenge of 后可接动词的 -ing 形式，说明难在哪里。作动词时也能表示向某人发出挑战，如 challenge someone to a race。",
+    "The team faces the challenge of keeping the equipment cool.",
+    "团队面临着让设备保持低温的难题。"
+  ],
+  "far-side": [
+    "the far side of",
+    "名词短语 · 描述相对位置",
+    "……离观察者较远的一侧。the far side of the moon 在文中指月球背向地球的一面。",
+    "the far side of the road 马路的另一侧 · on the far side of the river 在河的远岸 · the near side 较近的一侧",
+    "far side 从观察者的位置说哪一边更远。要说明对面的一侧，也可用 the other side of。",
+    "The path continues on the far side of the river.",
+    "这条小路在河的另一边继续延伸。"
+  ],
+  "at-present": [
+    "at present",
+    "时间短语 · 可放句首或句末",
+    "目前、现在。原文用它限定去火星所需时间所对应的条件。",
+    "at present 目前 · at the moment 此刻或目前 · present technology 现有技术",
+    "at present 强调目前的情况，常用于说明文。present 放在名词前也可以作形容词，表示“现有的、目前的”。",
+    "At present, only a few people have access to this equipment.",
+    "目前，只有少数人能使用这套设备。"
+  ],
+  "journey": [
+    "journey",
+    "可数名词 · 原文 a journey to Mars",
+    "旅程。强调从出发地到目的地的行程，常用来谈路上花了多久。",
+    "a journey to … 前往……的旅程 · a six-month journey 六个月的旅程 · make a long journey 长途跋涉",
+    "journey 强调行程。trip 常指一次出行，也可能包含往返。travel 作名词泛指旅行活动时通常不可数。",
+    "The journey to the research station took three days.",
+    "去研究站的行程花了三天。"
+  ],
+  "safety": [
+    "safety",
+    "不可数名词 · 形容词 safe",
+    "安全，受到保护的状态。文中与 health 并列，指宇航员的身体健康和安全保障。",
+    "food safety 食品安全 · safety rules 安全守则 · ensure safety 确保安全",
+    "safety 是名词，safe 是形容词，safely 是副词。a safe landing 指安全的着陆，land safely 指安全地着陆。",
+    "The crew tested the safety system before landing.",
+    "机组人员在着陆前测试了安全系统。"
+  ],
+  "wild-dream": [
+    "wild dream",
+    "名词短语 · wild 在这里表示大胆或离奇",
+    "大胆到让人觉得很难实现的梦想。原文 not a completely wild dream 表达了科学家保留希望的态度。",
+    "a wild idea 大胆或离奇的想法 · a wild guess 没把握的猜测 · wild animals 野生动物",
+    "wild 修饰 dream、idea 或 guess 时常带有超出常规的意味，具体褒贬要看语境。修饰动植物时，常表示野生，如 wild animals 和 wild flowers。",
+    "The plan sounded like a wild dream at first.",
+    "这个计划起初听起来像个大胆得难以实现的梦想。"
+  ],
+  "cooperate": [
+    "cooperate with",
+    "动词短语 · 原文 cooperating with",
+    "与……合作。原文用 cooperating with one another 表示各国与科学家彼此合作。",
+    "cooperate with other teams 与其他团队合作 · cooperate on a project 在项目上合作 · international cooperation 国际合作",
+    "with 引出合作伙伴，on 引出合作事项。表示“彼此”可用 one another 或 each other。",
+    "The students cooperated with another class on a science project.",
+    "学生们和另一个班合作完成了一项科学项目。"
+  ],
+  "set-foot-on": [
+    "set foot on",
+    "固定短语 · set–set–set",
+    "踏上，走上某个地方。set foot on the moon 指人类踏上月球。",
+    "set foot on the moon 踏上月球 · set foot in a new country 踏入一个新的国家 · set foot on an island 登上一座岛",
+    "搭配里常用单数 foot。强调踏上某个表面常用 on，进入某地常用 in。原文的 set 在 have 后，是过去分词。",
+    "It was the first time she had set foot on the island.",
+    "那是她第一次踏上这座岛。"
+  ],
+  "land": [
+    "land",
+    "动词、名词 · 原文 landed",
+    "使着陆。原文 landed rovers on Mars 指人类让火星车在火星表面着陆。",
+    "land a spacecraft 使航天器着陆 · land on Mars 在火星着陆 · a safe landing 一次安全着陆",
+    "载具自己着陆时，载具作主语。人或团队使载具着陆时，载具作宾语。比较 The rover landed. 和 The team landed the rover.",
+    "The pilot landed the plane safely.",
+    "飞行员让飞机安全着陆。"
+  ],
+  "likely": [
+    "likely",
+    "形容词 · 原文 It seems likely that …",
+    "可能的，看起来有较大可能性的。作者以带保留的预测收束全文。",
+    "be likely to do 很可能做…… · It is likely that … 很可能…… · It seems likely that … 看来很可能……",
+    "同一预测可以用主语＋be likely to 或 It is likely that 表达。用 seems likely 时，强调这是根据目前所知作出的判断。",
+    "It seems likely that the clouds will clear before sunset.",
+    "看起来云层很可能在日落前散开。"
+  ]
+}
+</script>
+<script>
+(() => {
+  const entries = JSON.parse(document.querySelector('#vocab-data').textContent);
+  const passage = document.querySelector('.passage');
+  const lessonBar = document.querySelector('.lesson-bar');
+  const card = document.querySelector('#vocab-card');
+  const body = card.querySelector('.vocab-card-body');
+  const fields = ['title', 'form', 'sense', 'pattern', 'usage', 'example', 'example-cn']
+    .map(name => document.getElementById('vocab-' + name));
+  let active;
+  let positionFrame = 0;
+  let pointerStart;
+
+  function closeCard(restoreFocus = false) {
+    if (!active) return;
+    const trigger = document.getElementById(active.id);
+    trigger?.setAttribute('aria-expanded', 'false');
+    active = undefined;
+    card.hidden = true;
+    if (restoreFocus) trigger?.focus({ preventScroll: true });
+  }
+
+  function placeCard() {
+    positionFrame = 0;
+    if (!active) return;
+    if (!active.isConnected) {
+      const replacement = document.getElementById(active.id);
+      if (!replacement) {
+        closeCard();
+        return;
+      }
+      active = replacement;
+      active.setAttribute('aria-expanded', 'true');
+    }
+
+    const rect = active.getBoundingClientRect();
+    const bar = lessonBar.getBoundingClientRect();
+    const viewportWidth = document.documentElement.clientWidth;
+    const viewportHeight = innerHeight;
+    const topEdge = bar.top <= 1 ? Math.max(10, bar.bottom + 8) : 10;
+    const gap = 8;
+
+    if (rect.bottom <= topEdge || rect.top >= viewportHeight - 10) {
+      closeCard();
+      return;
+    }
+
+    card.style.maxHeight = '';
+    const idealHeight = card.offsetHeight;
+    const above = rect.top - topEdge - gap;
+    const below = viewportHeight - 10 - rect.bottom - gap;
+    const useBelow = below >= idealHeight || below >= above;
+    card.style.maxHeight = Math.max(0, Math.min(idealHeight, useBelow ? below : above)) + 'px';
+    const left = Math.max(10, Math.min(rect.left, viewportWidth - card.offsetWidth - 10));
+    const top = useBelow ? rect.bottom + gap : rect.top - gap - card.offsetHeight;
+    card.style.left = Math.round(left) + 'px';
+    card.style.top = Math.round(Math.max(topEdge, top)) + 'px';
+  }
+
+  function schedulePosition(event) {
+    if (!active || card.contains(event.target instanceof Node ? event.target : null) || positionFrame) return;
+    positionFrame = requestAnimationFrame(placeCard);
+  }
+
+  function openCard(word) {
+    if (active?.id === word.id) {
+      closeCard(true);
+      return;
+    }
+    const entry = entries[word.dataset.vocab];
+    if (!entry) return;
+    closeCard();
+    fields.forEach((field, index) => { field.textContent = entry[index]; });
+    active = word;
+    active.setAttribute('aria-expanded', 'true');
+    card.hidden = false;
+    body.scrollTop = 0;
+    placeCard();
+    if (!card.hidden) fields[0].focus({ preventScroll: true });
+  }
+
+  function selectWord(word, openTools = false) {
+    closeCard();
+    if (openTools && document.querySelector('#annotation-tools').hidden) {
+      document.querySelector('#annotation-toggle').click();
+    }
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(word);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  }
+
+  passage.addEventListener('pointerdown', event => {
+    pointerStart = { word: event.target.closest('.vocab-word'), x: event.clientX, y: event.clientY };
+  });
+  passage.addEventListener('click', event => {
+    const word = event.target.closest('.vocab-word');
+    const start = pointerStart;
+    pointerStart = undefined;
+    if (!word || !window.getSelection()?.isCollapsed) return;
+    event.stopPropagation();
+    if (event.detail > 0 && start?.word === word &&
+        Math.hypot(event.clientX - start.x, event.clientY - start.y) > 6) {
+      selectWord(word);
+      return;
+    }
+    openCard(word);
+  });
+  passage.addEventListener('keydown', event => {
+    const word = event.target.closest('.vocab-word');
+    if (!word || !['Enter', ' '].includes(event.key)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    openCard(word);
+  });
+  card.querySelector('#vocab-select').addEventListener('click', () => {
+    const word = active && document.getElementById(active.id);
+    if (word) selectWord(word, true);
+  });
+  card.querySelector('#vocab-close').addEventListener('click', () => closeCard(true));
+  document.addEventListener('click', event => {
+    if (active && !card.contains(event.target)) closeCard();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && active) {
+      event.preventDefault();
+      closeCard(true);
+    }
+  });
+  window.addEventListener('scroll', schedulePosition, true);
+  window.addEventListener('resize', schedulePosition);
 })();
 </script>
 </body>
